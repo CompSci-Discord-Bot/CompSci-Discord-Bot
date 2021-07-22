@@ -1,5 +1,5 @@
 on: push
-name: 🚀 Deploy website on push
+name: 🚀 Upload to PebbleHost on push
 jobs:
   web-deploy:
     name: 🎉 Deploy
