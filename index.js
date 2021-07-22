@@ -153,6 +153,19 @@ client.on("message", message =>
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
 //==========================================================================================================
 
+  command(message, 'rolelist', RETURN => { //if (message.content.startsWith(prefix + "rolelist")) {
+    
+    const Role = message.guild.roles.cache.find(role => role.name == "Bot");
+    const Members = message.guild.members.cache.filter(member => member.roles.cache.find(role => role == Role)).map(member => member.user.tag);
+    
+    var count;
+
+    Members.forEach(element => 
+      (message.channel.send(`${element}`),count=count+1))
+      message.channel.send(`Total Number of Users in Role: ${count}`)})
+
+      
+
     //Basic ping command to check the status and delay time of the bot
     command(message /*Message going into command function */, 
             'ping' /*Command headed into command function */,
@@ -205,11 +218,6 @@ client.on("message", message =>
   // { //softkill functionality
   //   softkill = Server.soft_kill(message,softkill);
   // }
-
-
-//=======================================================================================================
-// 
-//=======================================================================================================
 
 
   if(`${devstate}`=='false') //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
