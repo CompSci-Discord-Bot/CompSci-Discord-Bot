@@ -214,8 +214,6 @@ client.on("message", message =>
     })
 
     command(message, 'createroles', RETURN => {
-      if (!message.guild)
-        return;
       Channelcreator.rolecreator(message);
     })
 
