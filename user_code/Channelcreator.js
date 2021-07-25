@@ -18,10 +18,10 @@ function csvparse(message)
     var channelname = `${Subj}-${Crse}-${instructorarray[lastnamepos]}`;
     var rolename =  `${Subj} ${Crse}`;
 
-    
-    createchannel(channelname,message)
+    //rolecreator(message);
+    createchannel(channelname,message);
     console.log(`Created Channel: ${channelname}`);
-    categorymatcher(message,rolename)
+    categorymatcher(message,rolename);
     })
 
     .on('end', () => {
