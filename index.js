@@ -213,6 +213,12 @@ client.on("message", message =>
       Administrative.ban(message);
     })
 
+    command(message, 'createroles', RETURN => {
+      if (!message.guild)
+        return;
+      Channelcreator.rolecreator(message);
+    })
+
   //Softkill function command call (Calls the reverse of the status of softkill)
   // if(message.content === `${prefix}softkill`) 
   // { //softkill functionality
