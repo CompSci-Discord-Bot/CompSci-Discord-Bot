@@ -209,8 +209,13 @@ client.on("message", message =>
 /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
    if(message.content.startsWith(`${prefix}csvparse`)&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))){
-    Channelcreator.categorycreator(message);
-     Channelcreator.csvparse(message);
+     var promise = new Promise(function(){ 
+       Channelcreator.categorycreator(message);
+       console.log("in channel creator");
+      })
+      promise.then(function(table){
+       Channelcreator.csvparse(message,table).catch(console.error);
+     });
     }
     if((message.content.startsWith(`${prefix}cc`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`)))
    {

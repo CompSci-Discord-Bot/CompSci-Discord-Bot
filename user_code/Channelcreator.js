@@ -66,26 +66,24 @@ function categorycreator(message)
         var channel = message.guild.channels.create(`${line} ${semester}`, { type: 'category' })
         .then(channel => {
             catTable[`${line}`]=channel.id
-        }) 
+        }).catch(console.error)
+    }).on('close',function(catTable){
+        return catTable;
     })
 }
 
 
-function createchannel(name, message)
+function createchannel(name, message, table)
 {
     message.guild.channels.create(name, { reason: 'Needed a cool new channel' })
         .then(channel => {
-            var catTable=null
-            //console.log(channel.name)
-            if(catTable!=null){
-                
-            // message.guild.channels.cache.forEach(category => { 
-            //     if(category.type==='category'&& `${channel.name.toUpperCase().substring(0,8)}`.includes(`${category.name.substring(0,8)}`)){
-            //     //channel.setParent(category.id);
-            //     console.log(`${channel.name} matches ${category.name}`)
-                //freezing here, too much to cycle through is my guess.Maybe creat an array of categories+id's?
+            console.log(channel.name)
+            if(table!=null){  
+              //for (var i; i = 0; i++){
+               console.log(Object.keys(table)[i]);
+              //}
             }else{
-
+                console.log("table is null")
             } }).catch(console.error);
 }
 
