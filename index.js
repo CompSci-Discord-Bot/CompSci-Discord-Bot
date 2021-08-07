@@ -8,6 +8,8 @@ const {devid, brendanid, chiaraid, maincsquoteschannel, devcsquoteschannel, modd
 //Put developerID in ids.json in devid when working on testbots to override locked commands
 
 const command = require('./command')
+const compareServer = require('./servercheck')
+
 const Administrative = require("./user_code/Administrative");
 const Entertainment = require("./user_code/Entertainment");
 const Server = require("./user_code/Server");
@@ -58,7 +60,6 @@ if(`${devstate}`=='false')
   Server.cronjobs(client)
 }
 
-
 //=======================================================================================================
 // The client.on section below activates when anybody on the server sends a message on any server the bot
 // is apart of.  This may include the EMU CompSci server, the EMU hangout, Bot Dev, or any other server 
@@ -78,8 +79,8 @@ client.on("message", message =>
   }
 
   //ID for CompSci server only
-  if(server === `707293853958275125`)
-  {     
+  compareServer(message, '707293853958275125', RETURN => {
+
     //Adds a professor rating to file after mod review
     command(message, 'ratep', RETURN => {
       ReviewsCode.RateProfessor(message, client);
@@ -141,13 +142,11 @@ client.on("message", message =>
     {
       bypass = Server.bypass(message,bypass);
     }
-  }
+  })
 
-  //ID for EMU Hangout only
-  if(server === `731575925262778450`)
-  {
+  // //ID for EMU Hangout only
 
-  }
+  compareServer(message, '731575925262778450', RETURN => { })
 
 //==========================================================================================================
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
@@ -163,8 +162,6 @@ client.on("message", message =>
     Members.forEach(element => 
       (message.channel.send(`${element}`),count=count+1))
       message.channel.send(`Total Number of Users in Role: ${count}`)})
-
-      
 
     //Basic ping command to check the status and delay time of the bot
     command(message /*Message going into command function */, 
@@ -222,7 +219,6 @@ client.on("message", message =>
   // { //softkill functionality
   //   softkill = Server.soft_kill(message,softkill);
   // }
-
 
   if(`${devstate}`=='false') //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
   {
