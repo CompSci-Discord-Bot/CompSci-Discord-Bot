@@ -29,16 +29,6 @@ function csvparse(message,table)
         
     });
 }
-function driver(message){
-    var promise=new Promise(function(){
-      categorycreator(message);
-    }).then((table)=>{
-        console.log(`test: ${Object.entries(table)}`)
-        //why is this not printing 
-        csvparse(message,table);
-        
-    }).catch(console.error)
-}
 //create categories first, then as channels are created match them
 function categorymatcher(message,rolename){
     message.guild.channels.cache.forEach(channel => { 
@@ -68,7 +58,8 @@ function categorycreator(message)
             catTable[`${line}`]=channel.id
         }).catch(console.error)
     }).on('close',function(catTable){
-        return catTable;
+        
+        return (catTable);
     })
 }
 
@@ -77,14 +68,15 @@ function createchannel(name, message, table)
 {
     message.guild.channels.create(name, { reason: 'Needed a cool new channel' })
         .then(channel => {
-            console.log(channel.name)
-            if(table!=null){  
-              //for (var i; i = 0; i++){
-               console.log(Object.keys(table)[i]);
-              //}
-            }else{
-                console.log("table is null")
-            } }).catch(console.error);
+            //console.log(channel.name)
+            message.guild.channels.cache.forEach(category => { 
+                if(category.type==='category'&& `${category.name}`.includes(channel.name.substr(5,3))){
+                    //console.log(`matched ${channel.name} and ${category.name}`);
+                    channel.setParent(category.id);
+                    console.log(`Parent of ${channel.name} set `)
+                    return;
+                }
+            } )}).catch(console.error);
 }
 
 async function deletechannel(message)
@@ -120,4 +112,4 @@ async function channelsort(message)
 }
 
 //delete unused ones at somepoint
-module.exports = { csvparse, createchannel, deletechannel, categorycreator,driver,categorymatcher, deletecategory, swapper, channelsort};
+module.exports = { csvparse, createchannel, deletechannel, categorycreator,categorymatcher, deletecategory, swapper, channelsort};

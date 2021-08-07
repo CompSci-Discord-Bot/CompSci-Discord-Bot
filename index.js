@@ -210,7 +210,8 @@ client.on("message", message =>
 
    if(message.content.startsWith(`${prefix}csvparse`)&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))){
      var promise = new Promise(function(res,rej){ 
-       res(Channelcreator.categorycreator(message));
+       
+       res(Channelcreator.categorycreator(message))
       }).finally((table)=>{ 
        Channelcreator.csvparse(message,table);
      }).catch(console.error)
@@ -222,8 +223,6 @@ client.on("message", message =>
       name="new-unnamed-channel"
     Channelcreator.createchannel(name,message)
    }
-   if((message.content.startsWith(`${prefix}driver`))&&(((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))))
-     Channelcreator.driver(message)
    if((message.content.startsWith(`${prefix}catc`))&&(((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))))
      Channelcreator.categorycreator(message)
    if((message.content.startsWith(`${prefix}deleteALL`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${chiaraid}`)))
