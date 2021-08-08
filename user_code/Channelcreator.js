@@ -38,8 +38,7 @@ function csvparse(message)
 //   creates basic CompSci Class Categories
 //   Not for individual category creation
 function categorycreator(message)
-{   
-    var catTable=new Object();
+{
     const readInterface = readline.createInterface(
     {
         input: fs.createReadStream('./categories.txt'),
