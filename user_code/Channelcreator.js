@@ -24,6 +24,7 @@ function csvparse(message)
     var instructorarray = name.replace("(P)", "").trim().split(" ");
     var lastnamepos = (instructorarray.length -1);
     var channelname = `${Subj}-${Crse}-${instructorarray[lastnamepos]}`;
+
     rolename =  `${Subj} ${Crse}`;
     createchannel(channelname,message)//creates and sorts the channels
     })
@@ -115,5 +116,26 @@ function deletecategory(message)
 }
 
 
-//delete unused ones at somepoint
+
+async function rolecreator(message)
+{  
+    const readInterface = readline.createInterface({
+        input: fs.createReadStream('./categories.txt'),
+        output: process.stdout,
+        console: false
+    });
+
+    readInterface.on('line', function(line) 
+    {
+        var semester = ('Fall 2021')
+        message.guild.roles.create({
+            data: {
+              name: `${line} ${semester}`,
+              color: 'BLUE',
+            },
+            reason: 'idfk',
+          })
+    });    
+}
+
 module.exports = { csvparse, createchannel, deletechannel, categorycreator, deletecategory};

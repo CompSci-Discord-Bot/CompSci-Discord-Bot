@@ -19,10 +19,14 @@ async function main(message)
 
 	// And now we can update our output with a bit more information
 	// We will also run a check to make sure the log we got was for the same author's message
+	
+	var server = message.guild.id
 	if (target.id === message.author.id) {
-		console.log(`A message by ${message.author.tag} was deleted by ${executor.tag}. Message "${message}"`);
-	}	else {
-		console.log(`A message by ${message.author.tag} was deleted, but we don't know by who.`);
+		console.log(`A message by ${message.author.tag} was deleted by ${executor.tag} in ${server}. Message "${message}"`);
+	}	
+	else 
+	{
+		console.log(`A message by ${message.author.tag} was deleted in ${server}, but we don't know by who.`);
 	}
 }
 module.exports = { main }//, makeChannel};
