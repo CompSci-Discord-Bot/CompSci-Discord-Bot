@@ -137,4 +137,4 @@ async function rolecreator(message)
     });    
 }
 
-module.exports = { csvparse, createchannel, deletechannel, categorycreator, deletecategory};
+module.exports = { csvparse, createchannel, deletechannel, categorycreator, deletecategory, rolecreator};
