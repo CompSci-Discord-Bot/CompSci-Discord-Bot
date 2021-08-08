@@ -3,7 +3,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const readline = require('readline');
 const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
-const semester = ('Winter 2021')//CHANGE TO CURRENT SEMESTER
+const semester = ('Fall 2021')//CHANGE TO CURRENT SEMESTER
 
 
     // If CSV is parsing undefined, make sure first line is the fields for CSV,
