@@ -33,14 +33,17 @@ if(`${devstate}`=='false')
 Server.cronjobs(client)
 }
 
+const intents = new Intents(32767);
+const client = new Client({ intents });
+
 //In DiscordJS V13 Intents are required!
-const client = new Client({
-    intents:
-    [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-    ]
-});
+// const client = new Client({
+//     intents:
+//     [
+//         Intents.FLAGS.GUILDS,
+//         Intents.FLAGS.GUILD_MESSAGES,
+//     ]
+// });
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 const commands = [];
@@ -109,6 +112,24 @@ client.once('ready', () =>
     }
 })();
 });
+
+
+client.on("interactionCreate", async interaction => {
+  if(!interaction.isCommand()) return;
+
+  const command = client.commands.get(interaction.commandName);
+
+  if(!command) return;
+
+  try{
+    await command.execute(interaction);
+  }
+  catch(err){
+    if(err) console.error(err);
+
+    await interaction.reply({content: "An error occurred while executing that command.", ephemeral:true})
+  }
+})
 
 
 client.on("messageCreate", message => 
