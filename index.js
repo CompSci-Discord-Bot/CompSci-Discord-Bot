@@ -33,7 +33,6 @@ if(`${devstate}`=='false')
 Server.cronjobs(client)
 }
 
-
 //In DiscordJS V13 Intents are required!
 const client = new Client({
     intents:
@@ -54,21 +53,6 @@ for(const file of commandFiles)
     commands.push(command.data.toJSON());
     client.commands.set(command.data.name, command);
 }
-
-
-
-// const eventFiles = fs
-//     .readdirSync("./events")
-//     .filter(file=>file.endsWith(".js"));
-
-// for(const file of eventFiles)
-// {
-//     const event = require(`./events/${file}`);
-// if(event.once)
-//         client.once(event.name, (...args) => event.execute(...args, commands));
-//     else
-//         client.on(event.name, (...args) => event.execute(...args, commands));
-
 
 //=======================================================================================================
 //The Client.once below runs one time when the bot first starts up... We use it to confirm that the bot 
