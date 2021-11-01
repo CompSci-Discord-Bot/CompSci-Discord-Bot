@@ -195,12 +195,6 @@ client.on("messageCreate", message =>
         Quotescode.quote(message);
     })
 
-    if(message.content.toLowerCase().includes('brendy'))
-    {
-      message.delete({ timeout: 1000 });
-      console.log("Deleting message: "+ message.content);
-    }
-
     AutoCodeBlock.autoCodeBlock(message);
 
     //Adds the bypass command to toggle bypassing the Caps Filter
@@ -218,6 +212,13 @@ client.on("messageCreate", message =>
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
 //==========================================================================================================
 
+  var filter = message.content.toLowerCase()
+  if(filter.includes('brendy')||filter.includes('bendy')||filter.includes('bndy')||filter.includes('b r e n d y'))
+  {
+    message.delete({ timeout: 1000 });
+    console.log("[Brendy Flag]-Deleting message: "+ message.content+" sent by: "+message.author.username);
+  }
+
   command(message, 'rolelist', RETURN => { //if (message.content.startsWith(prefix + "rolelist")) {
     
     const Role = message.guild.roles.cache.find(role => role.name == "Bot");
@@ -227,7 +228,8 @@ client.on("messageCreate", message =>
 
     Members.forEach(element => 
       (message.channel.send(`${element}`),count=count+1))
-      message.channel.send(`Total Number of Users in Role: ${count}`)})
+      message.channel.send(`Total Number of Users in Role: ${count}`)
+    })
 
     //Basic ping command to check the status and delay time of the bot
     command(message /*Message going into command function */, 
@@ -304,7 +306,6 @@ client.on("messageCreate", message =>
     }
   }
 
-
   //DO NOT ENABLE THIS WITHOUT TALKING TO EMU HANGOUT SERVER OWNER AS WELL ABOUT IT
   // //The Holy CapsProtect function call
   // if (!bypass && (message.author.id !== `${brendanid}`))
@@ -345,4 +346,54 @@ client.on("messageCreate", message =>
 
 }); //End of message sent loop
 
+
+
+//Fires when a message is deleted
+client.on('messageDelete', async message => 
+{  
+  Clientmessagedeletion.main(message);
+});
+
+if(`${devstate}`=='false')
+{
+  //Fires when users updates their user status presence and logs that status in a specific text channel
+  client.on('presenceUpdate', async (oldPresence, newPresence) => 
+  {
+    Brendan.presence(oldPresence, newPresence);
+  });
+
+
+
+  //Fires when a new text channel is created on any server
+  client.on('channelCreate', async (channel) => 
+  {
+
+    const exampleEmbed = new Discord.MessageEmbed()
+    .setColor('#0099ff')
+    .setTitle(`Channel Name: ${channel.name}`)
+    .setURL('https://discord.com/invite/Yu5wpJdfmF')
+    .setAuthor('Mod Support', 'https://cdn.discordapp.com/avatars/404717378715385856/bdc9f3e337901871560a65e7aefea280.webp?size=80')
+    //.setDescription('Some description here')
+    .setThumbnail('https://compsci.live/logo.png')
+    .addFields(
+      { name: 'Please be aware that the mods have other commitments', value: 'It may take several hours or longer to answer your ticket, especially on nights and weekends.' },
+      { name: '\u200B', value: '\u200B' },
+      { name: 'While you are waiting for a response', value: 'You can help us by describing your problem in detail. If it relates to homework, please include the assignment requirements.'},
+      { name: '\u200B', value: '\u200B' },
+      { name: 'If this is a ticket for help with an assignment', value: 'Please ensure you have read and understood the `how to ask for help` document, located here: https://docs.google.com/document/d/1de_N24_ewXeIRyC5eAMELzoY1qMw7oREJd2qPduTEd4/edit'},
+      { name: '\u200B', value: '\u200B' },
+    )
+    .setTimestamp()
+    .setFooter('Please note, this ticket will automatically close in 24 hours!  Thanks!');
+
+    if(channel.name.includes("ticket"))
+    {
+      //guild===`707293853958275125`;
+      channel.send(exampleEmbed);
+    }
+  });
+}
+
+
 client.login(process.env.TOKEN);
+

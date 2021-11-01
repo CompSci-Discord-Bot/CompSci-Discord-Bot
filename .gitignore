@@ -4,9 +4,14 @@ package.json
 package-lock.json
 tempQuotesList.txt
 incommingcsquotes.txt
+Summer 2021 Class Schedule.csv
+otherusers/
 /user_code/quotes.json
 otherusers
 user_code/Brendan.js
+logs/quotes.json
+.env
+/user_code/quotes.json
 CSBot.code-workspace
 .env
 logs/professors/*

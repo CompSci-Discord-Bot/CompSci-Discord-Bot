@@ -1,8 +1,10 @@
 async function main(message)
 {
     // ignore direct messages
-	if (!message.guild) return;
-	const fetchedLogs = await message.guild.fetchAuditLogs({
+	if (!message.guild) 
+		return;
+	
+		const fetchedLogs = await message.guild.fetchAuditLogs({
 		limit: 1,
 		type: 'MESSAGE_DELETE',
 	});
@@ -21,9 +23,10 @@ async function main(message)
 	// We will also run a check to make sure the log we got was for the same author's message
 	
 	var server = message.guild.id
-	if (target.id === message.author.id) {
+	if (target.id === message.author.id)
+	{
 		console.log(`A message by ${message.author.tag} was deleted by ${executor.tag} in ${server}. Message "${message}"`);
-	}	
+	}
 	else 
 	{
 		console.log(`A message by ${message.author.tag} was deleted in ${server}, but we don't know by who.`);

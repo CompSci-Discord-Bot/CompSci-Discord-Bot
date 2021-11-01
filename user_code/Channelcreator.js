@@ -18,14 +18,12 @@ function csvparse(message)
     var channelname = `${Subj}-${Crse}-${instructorarray[lastnamepos]}`;
     var rolename =  `${Subj} ${Crse}`;
 
-    
-    createchannel(channelname,message)
-    console.log(`Created Channel: ${channelname}`);
-    categorymatcher(message,rolename)
+    createchannel(channelname,message,time)//creates and sorts the channels
     })
 
     .on('end', () => {
-    console.log('CSV file successfully processed');
+    console.log("CSV file successfully processed");
+        
     });
 }
 function categorymatcher(message,rolename){//create categories first, then as channels are created match them
@@ -50,15 +48,56 @@ function categorycreator(message)
     });    
 }
 
-function createchannel(name, message)
+    //creates individual and csv channels
+    //individuals aren't sorted, name can be customized by 'cc' command
+    //csvparse are sorted
+    //DOES NOT SORT MATH ELECTIVE OR NON CODED CLASSES (e.g. "eta-bahorski")
+function createchannel(name, message,time)
 {
-    message.guild.channels.create(name, { reason: 'Needed a cool new channel' })
-    .then(channel => {
-        let category = message.guild.channels.cache.find(c => c.name == "Summer 2021" && c.type == "category");
-    
-        if (!category) throw new Error("Category channel does not exist");
-        channel.setParent(category.id);
-      }).catch(console.error);
+    message.guild.channels.create(name, { reason: 'Needed a cool new channel' })//creates new channel
+        .then(channel => 
+            {//given the created channel
+            
+            //gets class code from channel name (103, 311, etc)
+            var code=channel.name.substr(5,3); 
+            
+            //eliminates --Duplicate classes-- or --Online labs-- to 111 or 211 classes, as well as graduate classes
+            if(code.includes("112")||code.includes("212"))
+            {
+                channel.delete();//deletes them
+            }
+
+            //Sets the channel topic of the channel to the class time.
+            //Time grabbed from the passed in parameter time from csvparse function
+            if(time=="TBA")
+                console.log(name + " IS CURRENTLY SET TO TBA, THIS CLASS MAY NEED TO BE UPDATED LATER")
+            else
+                channel.setTopic(time)
+
+
+            //searches for a category that fits different specs to sort
+            message.guild.channels.cache.forEach(category => 
+            {
+                //finds category COSC ELECTIVES and sorts the elective classes into them (all classes not in categories.txt)
+                if(category.type==='category'&& category.name.includes("COSC XXX Electives")&&(code.includes("321")||code.includes("374")||code.includes("423")||code.includes("426")||code.includes("436")||code.includes("444")||code.includes("457")||code.includes("461")||code.includes("462")||code.includes("472")||code.includes("473")||code.includes("480")||code.includes("439")||code.substr(0,1).includes("5")||code.substr(0,1).includes("6")))
+                {
+                    channel.setParent(category.id);
+                    return;
+                }
+
+                if(category.type==='category'&& category.name.includes("COSC Mathematics Courses")&&(name.includes("MATH 321")||name.includes("MATH 120")||name.includes("MATH 360")))
+                {
+                    channel.setParent(category.id);
+                    return;
+                }
+
+                //if category and class channel share same code (for most required and gen ed classes)
+                else if(category.type==='category'&& `${category.name}`.includes(code))
+                {
+                    channel.setParent(category.id);
+                    return;
+                }   
+            })}).catch(console.error);        
 }
 
 async function deletechannel(message)
