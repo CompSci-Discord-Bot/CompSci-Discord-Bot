@@ -11,3 +11,5 @@ otherusers/
 user_code/Brendan.js
 logs/quotes.json
 .env
+/user_code/quotes.json
+CSBot.code-workspace
