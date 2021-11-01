@@ -129,12 +129,6 @@ client.on("message", message =>
         Quotescode.quote(message);
     })
 
-    if(message.content.toLowerCase().includes('brendy'))
-    {
-      message.delete({ timeout: 1000 });
-      console.log("Deleting message: "+ message.content);
-    }
-
     AutoCodeBlock.autoCodeBlock(message);
 
     //Adds the bypass command to toggle bypassing the Caps Filter
@@ -152,6 +146,13 @@ client.on("message", message =>
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
 //==========================================================================================================
 
+  var filter = message.content.toLowerCase()
+  if(filter.includes('brendy')||filter.includes('bendy')||filter.includes('bndy')||filter.includes('b r e n d y'))
+  {
+    message.delete({ timeout: 1000 });
+    console.log("[Brendy Flag]-Deleting message: "+ message.content+" sent by: "+message.author.username);
+  }
+
   command(message, 'rolelist', RETURN => { //if (message.content.startsWith(prefix + "rolelist")) {
     
     const Role = message.guild.roles.cache.find(role => role.name == "Bot");
@@ -161,7 +162,8 @@ client.on("message", message =>
 
     Members.forEach(element => 
       (message.channel.send(`${element}`),count=count+1))
-      message.channel.send(`Total Number of Users in Role: ${count}`)})
+      message.channel.send(`Total Number of Users in Role: ${count}`)
+    })
 
     //Basic ping command to check the status and delay time of the bot
     command(message /*Message going into command function */, 
@@ -237,7 +239,6 @@ client.on("message", message =>
       Quotescode.quotecatcher(message, client);
     }
   }
-
 
   //DO NOT ENABLE THIS WITHOUT TALKING TO EMU HANGOUT SERVER OWNER AS WELL ABOUT IT
   // //The Holy CapsProtect function call
