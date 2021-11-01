@@ -1,9 +1,10 @@
-//=======================================================================================================
-//Imports the necessary user code files to the index in order for later use
-//=======================================================================================================
-const Discord = require('discord.js')// imports the discord js library
-const client = new Discord.Client();
-const { prefix, token, devstate } = require('./config.json');
+require("dotenv").config();
+const fs = require("fs");
+const { REST } = require("@discordjs/rest");
+const { Routes } = require("discord-api-types/v9");
+const {Client, Intents, Collection} = require("discord.js");
+
+const { prefix, devstate } = require('./config.json');
 const {devid, brendanid, chiaraid, maincsquoteschannel, devcsquoteschannel, moddiscussion, devbotstatuschannel, mainbotstatuschannel } = require('./ids.json');
 //Put developerID in ids.json in devid when working on testbots to override locked commands
 
@@ -22,12 +23,42 @@ const AutoCodeBlock = require("./user_code/AutoCodeBlock");
 //THIS CONST BRENDAN LINE MUST BE COMMENTED OUT IF IN DEVELOPMENT MODE.  IT WILL WORK PROPERLY WITH JUST THIS LINE COMMENTED OUT WHEN DEVELOPING.
 const Brendan = require("./user_code/Brendan");
 
-var softkill = false;
-var bypass = false;
-
 
 //=======================================================================================================
-//The Client.once belowRuns one time when the bot first starts up... We use it to confirm that the bot 
+//The cronjob code below runs the cronjobs task to display the quote of the day in general on main 
+//server at 9 AM everyday if devstate is false (which means it is not being run in a testing enviorment)
+//=======================================================================================================
+if(`${devstate}`=='false')
+{  
+Server.cronjobs(client)
+}
+
+const intents = new Intents(32767);
+const client = new Client({ intents });
+
+//In DiscordJS V13 Intents are required!
+// const client = new Client({
+//     intents:
+//     [
+//         Intents.FLAGS.GUILDS,
+//         Intents.FLAGS.GUILD_MESSAGES,
+//     ]
+// });
+
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+const commands = [];
+
+client.commands = new Collection();
+
+for(const file of commandFiles)
+{
+    const command = require(`./commands/${file}`);
+    commands.push(command.data.toJSON());
+    client.commands.set(command.data.name, command);
+}
+
+//=======================================================================================================
+//The Client.once below runs one time when the bot first starts up... We use it to confirm that the bot 
 //                                     does not crash on startup.
 //=======================================================================================================
 client.once('ready', () => 
@@ -48,25 +79,60 @@ client.once('ready', () =>
 
     client.user.setActivity("with code!");  //Sets the discord status activity of the bot
   }
+
+  const CLIENT_ID = client.user.id;
+  
+  const rest = new REST({
+    version: "9"
+}).setToken(process.env.TOKEN);
+
+
+(async () => {
+    try 
+    {
+        if(process.env.ENV === "production")
+        {
+            await rest.put(Routes.applicationCommands(CLIENT_ID), {
+                body: commands
+            });
+            console.log("Successfully registered commands globally.")   
+        }
+        else
+        {
+            await rest.put(Routes.applicationGuildCommands(CLIENT_ID, process.env.GUILD_ID), {
+                body: commands
+            });
+            console.log("Successfully registered commands locally.") 
+        }
+    }
+    catch(err)
+    { 
+        if(err)
+            console.error(err) 
+    }
+})();
 });
 
 
-//=======================================================================================================
-//The cronjob code below Completes a cronjob task to display the quote of the day in general on main 
-// server at 9 AM everyday if devstate is false (which means it is not being run in a testing enviorment)
-//=======================================================================================================
-if(`${devstate}`=='false')
-{  
-  Server.cronjobs(client)
-}
+client.on("interactionCreate", async interaction => {
+  if(!interaction.isCommand()) return;
 
-//=======================================================================================================
-// The client.on section below activates when anybody on the server sends a message on any server the bot
-// is apart of.  This may include the EMU CompSci server, the EMU hangout, Bot Dev, or any other server 
-// depending on the situation.
-//=======================================================================================================
+  const command = client.commands.get(interaction.commandName);
 
-client.on("message", message => 
+  if(!command) return;
+
+  try{
+    await command.execute(interaction);
+  }
+  catch(err){
+    if(err) console.error(err);
+
+    await interaction.reply({content: "An error occurred while executing that command.", ephemeral:true})
+  }
+})
+
+
+client.on("messageCreate", message => 
 { // runs whenever a message is sent
 
   let server = message.guild.id;
@@ -79,7 +145,7 @@ client.on("message", message =>
   }
 
   //ID for CompSci server only
-  compareServer(message, '707293853958275125', RETURN => {
+  //compareServer(message, '707293853958275125', RETURN => {
 
     //Adds a professor rating to file after mod review
     command(message, 'ratep', RETURN => {
@@ -136,11 +202,11 @@ client.on("message", message =>
     {
       bypass = Server.bypass(message,bypass);
     }
-  })
+  //})
 
   // //ID for EMU Hangout only
 
-  compareServer(message, '731575925262778450', RETURN => { })
+ //compareServer(message, '731575925262778450', RETURN => { })
 
 //==========================================================================================================
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
@@ -254,31 +320,32 @@ client.on("message", message =>
 
 /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
-  //  if(message.content.startsWith(`${prefix}csvparse`)&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))){
-  //    var promise = new Promise(function(res,rej)
-  //    { 
-  //      res(Channelcreator.categorycreator(message))
-  //     }).finally(()=>{ 
-  //      Channelcreator.csvparse(message);
-  //    }).catch(console.error)
-  //    }
-  //   if((message.content.startsWith(`${prefix}cc`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`)))
-  //  {
-  //   var name= message.content.substring(4,message.content.length)
-  //   if(name=="")
-  //     name="new-unnamed-channel"
-  //   Channelcreator.createchannel(name,message)
-  //  }
-  //  if((message.content.startsWith(`${prefix}catc`))&&(((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))))
-  //    Channelcreator.categorycreator(message)
-  //  if((message.content.startsWith(`${prefix}deleteALL`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${chiaraid}`)))
-  //   Channelcreator.deletechannel(message);
-  //  if((message.content.startsWith(`${prefix}deletecat`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`)))
-  //    Channelcreator.deletecategory(message);
+//    if(message.content.startsWith(`${prefix}csvparse`)&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))){
+//      var promise = new Promise(function(res,rej)
+//      { 
+//        res(Channelcreator.categorycreator(message))
+//       }).finally(()=>{ 
+//        Channelcreator.csvparse(message);
+//      }).catch(console.error)
+//      }
+//     if((message.content.startsWith(`${prefix}cc`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`)))
+//    {
+//     var name= message.content.substring(4,message.content.length)
+//     if(name=="")
+//       name="new-unnamed-channel"
+//     Channelcreator.createchannel(name,message)
+//    }
+//    if((message.content.startsWith(`${prefix}catc`))&&(((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`))))
+//      Channelcreator.categorycreator(message)
+//    if((message.content.startsWith(`${prefix}deleteALL`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${chiaraid}`)))
+//     Channelcreator.deletechannel(message);
+//    if((message.content.startsWith(`${prefix}deletecat`))&&((message.author.id === `${brendanid}`)||(message.author.id === `${devid}`)))
+//      Channelcreator.deletecategory(message);
      
   /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
 }); //End of message sent loop
+
 
 
 //Fires when a message is deleted
@@ -328,4 +395,5 @@ if(`${devstate}`=='false')
 }
 
 
-client.login(token)
+client.login(process.env.TOKEN);
+

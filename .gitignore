@@ -3,13 +3,25 @@ app.yaml
 package.json
 package-lock.json
 tempQuotesList.txt
-logs
-node_modules/
 incommingcsquotes.txt
 Summer 2021 Class Schedule.csv
 otherusers/
+/user_code/quotes.json
+otherusers
 user_code/Brendan.js
 logs/quotes.json
 .env
 /user_code/quotes.json
 CSBot.code-workspace
+.env
+logs/professors/*
+logs/
+logs/professors/jiang.txt
+logs/professors/jiang.txt
+logs/professors/kashliev.txt
+logs/professors/maniccam.txt
+logs/professors/panja.txt
+logs/professors/poh.txt
+logs/professors/tehranipour.txt
+events/
+/events/

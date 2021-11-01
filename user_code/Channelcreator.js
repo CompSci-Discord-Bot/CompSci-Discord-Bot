@@ -2,21 +2,13 @@ const { prefix } = require('../config.json')
 const fs = require('fs');
 const csv = require('csv-parser');
 const readline = require('readline');
-const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
-const semester = ('Fall 2021')//CHANGE TO CURRENT SEMESTER
 
-
-    // If CSV is parsing undefined, make sure first line is the fields for CSV,
-    // not ---ComputerScience---, or it wont run
-    // also ONLY do CS class list not all of EMU (or is will get messy really quick)
 function csvparse(message)
-{   
-
-    var rolename
-    fs.createReadStream('compscidata.csv')
+{
+    categorycreator(message);
+    fs.createReadStream('data.csv')
     .pipe(csv())
-    .on('data', (row) => { //extracts information from CSV
-    
+    .on('data', (row) => { 
     var Subj =  `${row["Subj"]}`;
     var Crse =  `${row["Crse"]}`;
     var time =  `${row["Time"]}`;
@@ -24,23 +16,26 @@ function csvparse(message)
     var instructorarray = name.replace("(P)", "").trim().split(" ");
     var lastnamepos = (instructorarray.length -1);
     var channelname = `${Subj}-${Crse}-${instructorarray[lastnamepos]}`;
+    var rolename =  `${Subj} ${Crse}`;
 
-    rolename =  `${Subj} ${Crse}`;
     createchannel(channelname,message,time)//creates and sorts the channels
     })
+
     .on('end', () => {
     console.log("CSV file successfully processed");
         
     });
 }
-
-
-//   creates basic CompSci Class Categories
-//   Not for individual category creation
+function categorymatcher(message,rolename){//create categories first, then as channels are created match them
+    message.guild.channels.cache.forEach(channel => { 
+        if(channel.type==='category'&&`${channel}`.includes(rolename)){
+            console.log("match")
+        };
+    });
+}
 function categorycreator(message)
-{
-    const readInterface = readline.createInterface(
-    {
+{  
+    const readInterface = readline.createInterface({
         input: fs.createReadStream('./categories.txt'),
         output: process.stdout,
         console: false
@@ -48,13 +43,10 @@ function categorycreator(message)
 
     readInterface.on('line', function(line) 
     {
-        var channel = message.guild.channels.create(`${line} ${semester}`, { type: 'category' })
-    }).on('close',function(){
-        
-        return ;
-    })
+        var semester = ('Summer 2021')
+        message.guild.channels.create(`${line} ${semester}`, { type: 'category' })
+    });    
 }
-
 
     //creates individual and csv channels
     //individuals aren't sorted, name can be customized by 'cc' command
@@ -108,27 +100,38 @@ function createchannel(name, message,time)
             })}).catch(console.error);        
 }
 
-//deletes all channels IN BOTCODE save for a few pre-recorded Id's
-//DO NOT USE IN MAIN
-//SHOULD ME COMMENTED OUT IN INDEX.JS
 async function deletechannel(message)
 {
-    message.guild.channels.cache.forEach(channel => {//delete ALL channels except hardcoded
+    message.guild.channels.cache.forEach(channel => {
         //ignores:references, github, devwork, classic-quotes,bot-status, voice, devtalk, content approval, and general
+
         if((channel.id!==('823034099925123092') && channel.id!==('823034119167672340') && channel.id!==('823034112155189268') && channel.id!==('823034145868349470')&& channel.id!==('838150077834854411')&& channel.id!==('838149486353842198')&& channel.id!==('838195992624103475')&& channel.id!==('841873032011055114')&& channel.id!==('841424759128588369')&& channel.id!==('823034099925123092'))){
         channel.delete()}});
 }
 
-//deletes ALL categories except hardcoded
 function deletecategory(message)
 {
     message.guild.channels.cache.forEach(category => {
-    if(category.type==='category' && category.id !== ('823029672630943757'))
+        if(category.id !== ('823029672630943757'))
         {
         category.delete()}});
 }
 
+async function swapper(name, message)
+{
+    let category = message.guild.channels.cache.find(c => c.name == "Text Channels" && c.type == "category"),
+    channel = message.guild.channels.cache.find(c => c.name == `${name}` && c.type == "text");
+  
+  if (category && channel) channel.setParent(category.id);
+  else console.error(`One of the channels is missing:\nCategory: ${!!category}\nChannel: ${!!channel}`);
+}
 
+
+async function channelsort(message)
+{
+    var textchannels = {} = message.guild.channels.cache.forEach(c => c.type == "text");
+
+}
 
 async function rolecreator(message)
 {  
@@ -151,4 +154,4 @@ async function rolecreator(message)
     });    
 }
 
-module.exports = { csvparse, createchannel, deletechannel, categorycreator, deletecategory, rolecreator};
+module.exports = { csvparse, createchannel, deletechannel, categorycreator, deletecategory, swapper, channelsort, rolecreator};
