@@ -325,7 +325,10 @@ if(`${devstate}`=='false')
       channel.send(exampleEmbed);
     }
   });
+
+client.on('voiceStateUpdate', (oldMember, newMember) => {
+  Brendan.voiceupdates(newMember,oldMember, client);
+});
+
 }
-
-
 client.login(token)
