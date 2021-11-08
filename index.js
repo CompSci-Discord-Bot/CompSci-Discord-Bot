@@ -147,7 +147,7 @@ client.on("message", message =>
 //==========================================================================================================
 
   var filter = message.content.toLowerCase()
-  if(filter.includes('brendy')||filter.includes('bendy')||filter.includes('bndy')||filter.includes('b r e n d y'))
+  if(filter.includes('brendy')||filter.includes('bendy')||filter.includes('bndy')||filter.includes('b r e n d y')||filter.includes('krendy'))
   {
     message.delete({ timeout: 1000 });
     console.log("[Brendy Flag]-Deleting message: "+ message.content+" sent by: "+message.author.username);
