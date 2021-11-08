@@ -12,6 +12,7 @@ function autoCodeBlock(message) {
             reply += messageContent;
             reply += "\n```\n";
             reply += "(If you are curious how to do this, check out https://www.codegrepper.com/code-examples/whatever/discord+syntax+highlighting)";
+            reply += `Original Message sent by: ${message.author.username}`;
             
             //Add thumbs down and wait for it
             message.channel.send(reply).then(function (message) {
