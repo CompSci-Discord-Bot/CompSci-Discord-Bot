@@ -1,4 +1,4 @@
-const { prefix } = require('./config.json')
+const { prefix } = require('../config.json')
 
 module.exports = (message, aliases, callback) => {
   if (typeof aliases === 'string') 

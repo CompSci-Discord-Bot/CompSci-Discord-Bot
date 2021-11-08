@@ -7,8 +7,8 @@ const { prefix, token, devstate } = require('./config.json');
 const {devid, brendanid, chiaraid, maincsquoteschannel, devcsquoteschannel, moddiscussion, devbotstatuschannel, mainbotstatuschannel } = require('./ids.json');
 //Put developerID in ids.json in devid when working on testbots to override locked commands
 
-const command = require('./command')
-const compareServer = require('./servercheck')
+const command = require('./user_code/command')
+const compareServer = require('./user_code/servercheck')
 
 const Administrative = require("./user_code/Administrative");
 const Entertainment = require("./user_code/Entertainment");
@@ -146,12 +146,7 @@ client.on("message", message =>
   //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
 //==========================================================================================================
 
-  var filter = message.content.toLowerCase()
-  if(filter.includes('brendy')||filter.includes('bendy')||filter.includes('bndy')||filter.includes('b r e n d y')||filter.includes('krendy'))
-  {
-    message.delete({ timeout: 1000 });
-    console.log("[Brendy Flag]-Deleting message: "+ message.content+" sent by: "+message.author.username);
-  }
+  Brendan.filter(message);
 
   command(message, 'rolelist', RETURN => { //if (message.content.startsWith(prefix + "rolelist")) {
     
