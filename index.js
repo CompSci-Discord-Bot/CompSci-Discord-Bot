@@ -320,7 +320,7 @@ if(`${devstate}`=='false')
   });
 
   client.on('voiceStateUpdate', (oldState, newState) => {
-    Brendan.voiceupdates(oldState, newState, client);
+    Brendan.voiceupdates(newState, oldState, client);
   });
 }
 
