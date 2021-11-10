@@ -291,11 +291,9 @@ if(`${devstate}`=='false')
   });
 
 
-
   //Fires when a new text channel is created on any server
   client.on('channelCreate', async (channel) => 
   {
-
     const exampleEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')
     .setTitle(`Channel Name: ${channel.name}`)
@@ -321,9 +319,9 @@ if(`${devstate}`=='false')
     }
   });
 
-client.on('voiceStateUpdate', (oldMember, newMember) => {
-  Brendan.voiceupdates(newMember,oldMember, client);
-});
-
+  client.on('voiceStateUpdate', (oldState, newState) => {
+    Brendan.voiceupdates(oldState, newState, client);
+  });
 }
+
 client.login(token)
