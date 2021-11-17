@@ -165,11 +165,16 @@ async function approveQuote(quote, client)
                         message.channel.send(`You have approved the quote.... ${quote}`);
 
                         jsonData['teacherQuotes'].push(message.content);
-
                         jsonData.save();
+                                                
+                        var counter = Object.keys(jsonData.teacherQuotes).length;
+                        client.channels.cache.get(`808161527373758464`).send(`Quote Approved! \nNew total quotes in list: ${counter} quotes`); 
 
                     } else {
-                        message.channel.send('You have disapproved the quote.');
+                        message.channel.send(`You have disapproved the quote... ${quote}`);
+
+                        var counter = Object.keys(jsonData.teacherQuotes).length;
+                        client.channels.cache.get(`808161527373758464`).send(`Quote Denied! \nTotal quotes in list is still: ${counter} quotes`); 
                     }
                 })
         });
