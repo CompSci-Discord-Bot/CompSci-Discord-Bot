@@ -86,9 +86,9 @@ async function quoteList(message)
             reply += quote + "\n\n";
         });
         // reply += "```";
-        fs.writeFileSync("../tempQuotesList.txt", reply);
+        fs.writeFileSync("tempQuotesList.txt", reply);
 
-        const buffer = fs.readFileSync("../tempQuotesList.txt");
+        const buffer = fs.readFileSync("tempQuotesList.txt");
 
         const attachment = new MessageAttachment(buffer, 'quotesList.txt');
 
