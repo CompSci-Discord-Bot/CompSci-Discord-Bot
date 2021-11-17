@@ -5,7 +5,6 @@ const readline = require('readline');
 const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
 const semester = ('Fall 2021')//CHANGE TO CURRENT SEMESTER
 
-
     // If CSV is parsing undefined, make sure first line is the fields for CSV,
     // not ---ComputerScience---, or it wont run
     // also ONLY do CS class list not all of EMU (or is will get messy really quick)
@@ -29,7 +28,7 @@ function csvparse(message)
     createchannel(channelname,message,time)//creates and sorts the channels
     })
     .on('end', () => {
-    console.log("CSV file successfully processed");
+    console.log('\n',"CSV file successfully processed");
         
     });
 }
@@ -50,7 +49,6 @@ function categorycreator(message)
     {
         var channel = message.guild.channels.create(`${line} ${semester}`, { type: 'category' })
     }).on('close',function(){
-        
         return ;
     })
 }
@@ -62,6 +60,8 @@ function categorycreator(message)
     //DOES NOT SORT MATH ELECTIVE OR NON CODED CLASSES (e.g. "eta-bahorski")
 function createchannel(name, message,time)
 {
+    let everyoneRole = message.guild.roles.cache.find(r => r.name === '@everyone');
+    
     message.guild.channels.create(name, { reason: 'Needed a cool new channel' })//creates new channel
         .then(channel => 
             {//given the created channel
@@ -81,7 +81,8 @@ function createchannel(name, message,time)
                 console.log(name + " IS CURRENTLY SET TO TBA, THIS CLASS MAY NEED TO BE UPDATED LATER")
             else
                 channel.setTopic(time)
-
+            
+                channel.createOverwrite(everyoneRole, {VIEW_CHANNEL: false})
 
             //searches for a category that fits different specs to sort
             message.guild.channels.cache.forEach(category => 
