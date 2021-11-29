@@ -5,11 +5,13 @@ const Discord = require('discord.js')// imports the discord js library
 const client = new Discord.Client();
 const { prefix, token, devstate } = require('./config.json');
 const {devid, brendanid, chiaraid, maincsquoteschannel, devcsquoteschannel, moddiscussion, devbotstatuschannel, mainbotstatuschannel } = require('./ids.json');
-//Put developerID in ids.json in devid when working on testbots to override locked commands
+//Put developerID in ids.json in devid when working on channelcreator to override locked commands
 
+//Include Command and Server handler code
 const command = require('./user_code/command')
 const compareServer = require('./user_code/servercheck')
 
+//Include rest of exported commands
 const Administrative = require("./user_code/Administrative");
 const Entertainment = require("./user_code/Entertainment");
 const Server = require("./user_code/Server");
@@ -18,18 +20,19 @@ const ReviewsCode = require("./user_code/Reviewscode");
 const Channelcreator = require("./user_code/Channelcreator");
 const Clientmessagedeletion = require("./user_code/Clientmessagedeletion");
 const AutoCodeBlock = require("./user_code/AutoCodeBlock");
+const NewChannel = require("./user_code/NewChannel");
+
 
 //THIS CONST BRENDAN LINE MUST BE COMMENTED OUT IF IN DEVELOPMENT MODE.  IT WILL WORK PROPERLY WITH JUST THIS LINE COMMENTED OUT WHEN DEVELOPING.
 const Brendan = require("./user_code/Brendan");
 
-var softkill = false;
-var bypass = false;
+// var softkill = false;
+// var bypass = false;
 
-
-//=======================================================================================================
-//The Client.once belowRuns one time when the bot first starts up... We use it to confirm that the bot 
-//                                     does not crash on startup.
-//=======================================================================================================
+/* =======================================================================================================
+The Client.once belowRuns one time when the bot first starts up... We use it to confirm that the bot 
+                                     does not crash on startup.
+=======================================================================================================*/
 client.once('ready', () => 
 {
   if(`${devstate}`=='true')
@@ -51,26 +54,22 @@ client.once('ready', () =>
 });
 
 
-//=======================================================================================================
-//The cronjob code below Completes a cronjob task to display the quote of the day in general on main 
-// server at 9 AM everyday if devstate is false (which means it is not being run in a testing enviorment)
-//=======================================================================================================
+/*=======================================================================================================
+  The cronjob code below Completes a cronjob task to display the quote of the day in general on main 
+  server at 9 AM everyday if devstate is false (which means it is not being run in a testing enviorment)
+//=======================================================================================================*/
 if(`${devstate}`=='false')
 {  
   Server.cronjobs(client)
 }
 
-//=======================================================================================================
-// The client.on section below activates when anybody on the server sends a message on any server the bot
-// is apart of.  This may include the EMU CompSci server, the EMU hangout, Bot Dev, or any other server 
-// depending on the situation.
-//=======================================================================================================
-
+/*=======================================================================================================
+   The client.on section below activates when anybody on the server sends a message on any server the bot
+   is apart of.  This may include the EMU CompSci server, the EMU hangout, Bot Dev, or any other server 
+   depending on the situation.
+//=======================================================================================================*/
 client.on("message", message => 
-{ // runs whenever a message is sent
-
-  let server = message.guild.id;
-
+{
   //Ignores bots from deleting their own messages with spam filter, and deleting other bots messages
   if(!message.content.startsWith(`${prefix}quote`))
   {
@@ -121,7 +120,7 @@ client.on("message", message =>
     })
 
     //The famous quote command used on the CompSci server!  
-    //This will allow people on EMU hangout to generate quotes ONLY... This does not include saving them
+    //This will allow people on EMU CompSci to generate quotes ONLY... This does not include saving them
     command(message, 'quote', RETURN => {
       if(message.content.startsWith(`${prefix}quote count`))
         Quotescode.quotecounter(message);
@@ -131,43 +130,33 @@ client.on("message", message =>
 
     AutoCodeBlock.autoCodeBlock(message);
 
-    //Adds the bypass command to toggle bypassing the Caps Filter
-    if (message.content === `${prefix}bypass`) 
-    {
-      bypass = Server.bypass(message,bypass);
-    }
+    // //Adds the bypass command to toggle bypassing the Caps Filter
+    // if (message.content === `${prefix}bypass`) 
+    // {
+    //   bypass = Server.bypass(message,bypass);
+    // }
   })
 
-  // //ID for EMU Hangout only
-
-  compareServer(message, '731575925262778450', RETURN => { })
-
-//==========================================================================================================
-  //Anything below this point  will work on ANY and ALL servers the bot is currently apart of
-//==========================================================================================================
-
+/*==========================================================================================================
+      Anything below this point  will work on ANY and ALL servers the bot is currently apart of
+ ==========================================================================================================*/
   Brendan.filter(message);
 
-  command(message, 'rolelist', RETURN => { //if (message.content.startsWith(prefix + "rolelist")) {
-    
+  command(message, 'rolelist', RETURN => { 
     const Role = message.guild.roles.cache.find(role => role.name == "Bot");
     const Members = message.guild.members.cache.filter(member => member.roles.cache.find(role => role == Role)).map(member => member.user.tag);
-    
-    var count;
 
-    Members.forEach(element => 
-      (message.channel.send(`${element}`),count=count+1))
-      message.channel.send(`Total Number of Users in Role: ${count}`)
+    Members.forEach(element => message.channel.send(`${element}`))
     })
 
     //Basic ping command to check the status and delay time of the bot
-    command(message /*Message going into command function */, 
-            'ping' /*Command headed into command function */,
+    command(message, /*Message going into command function */
+            'ping', /*Command headed into command function */
             RETURN /*Return from command method, should NOT be used in most situations */=> {
       message.channel.send(`🏓 Latency is ${Date.now() - message.createdTimestamp}ms. API Latency is ${Math.round(client.ws.ping)}ms`);
     })
 
-    //Kills and stops server with response (Activated by Brendan only!)
+    //Halts bot with response (Activated by Brendan only!)
     command(message, 'kill', RETURN => {
       Server.kill(message);
     })
@@ -219,12 +208,11 @@ client.on("message", message =>
 
   if(`${devstate}`=='false') //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
   {
-    Brendan.mentionalerts(client, message);
+    Brendan.mentions(client, message);
     Brendan.chatlogger(client, message);
+    
     if((message.channel.id === `${maincsquoteschannel}`)||(message.channel.id === `${moddiscussion}`))
-    {
       Quotescode.quotecatcher(message, client);
-    }
   }
   else if(`${devstate}`=='true') //If devmode is true, logs chats in console ONLY and run the quote catcher on the dev quotes
   {
@@ -273,55 +261,39 @@ client.on("message", message =>
      
   /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
+
+
+//Private module used for Brendan's private quotes pointed to Alerts
+  compareServer(message, '858812074813423696', RETURN => { 
+    if(`${devstate}`=='false')
+      Brendan.PrivateQuotes(message, client);
+  });
+
 }); //End of message sent loop
 
 
-//Fires when a message is deleted
-client.on('messageDelete', async message => 
-{  
-  Clientmessagedeletion.main(message);
-});
-
-if(`${devstate}`=='false')
+if(`${devstate}`=='false') 
 {
+  //Fires when a message is deleted
+  client.on('messageDelete', async message => {  
+    Clientmessagedeletion.main(message);
+  });
+
   //Fires when users updates their user status presence and logs that status in a specific text channel
-  client.on('presenceUpdate', async (oldPresence, newPresence) => 
-  {
+  client.on('presenceUpdate', async (oldPresence, newPresence) => {
     Brendan.presence(oldPresence, newPresence);
   });
 
-
   //Fires when a new text channel is created on any server
-  client.on('channelCreate', async (channel) => 
-  {
-    const exampleEmbed = new Discord.MessageEmbed()
-    .setColor('#0099ff')
-    .setTitle(`Channel Name: ${channel.name}`)
-    .setURL('https://discord.com/invite/Yu5wpJdfmF')
-    .setAuthor('Mod Support', 'https://cdn.discordapp.com/avatars/404717378715385856/bdc9f3e337901871560a65e7aefea280.webp?size=80')
-    //.setDescription('Some description here')
-    .setThumbnail('https://compsci.live/logo.png')
-    .addFields(
-      { name: 'Please be aware that the mods have other commitments', value: 'It may take several hours or longer to answer your ticket, especially on nights and weekends.' },
-      { name: '\u200B', value: '\u200B' },
-      { name: 'While you are waiting for a response', value: 'You can help us by describing your problem in detail. If it relates to homework, please include the assignment requirements.'},
-      { name: '\u200B', value: '\u200B' },
-      { name: 'If this is a ticket for help with an assignment', value: 'Please ensure you have read and understood the `how to ask for help` document, located here: https://docs.google.com/document/d/1de_N24_ewXeIRyC5eAMELzoY1qMw7oREJd2qPduTEd4/edit'},
-      { name: '\u200B', value: '\u200B' },
-    )
-    .setTimestamp()
-    .setFooter('Please note, this ticket will automatically close in 24 hours!  Thanks!');
-
-    if(channel.name.includes("ticket"))
-    {
-      //guild===`707293853958275125`;
-      channel.send(exampleEmbed);
-    }
+  client.on('channelCreate', async (channel) => {
+    NewChannel.AutoTicketMessage(channel);
   });
 
+  //Fires when the status of voice activity changes (I.E. When someone joins a vc, leaves a vc, or switches vc)
   client.on('voiceStateUpdate', (oldState, newState) => {
     Brendan.voiceupdates(newState, oldState, client);
   });
 }
 
+//Logs the bot into the token value given on the 
 client.login(token)
