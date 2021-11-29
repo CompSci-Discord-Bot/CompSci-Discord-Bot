@@ -15,3 +15,9 @@ logs/quotes.json
 CSBot.code-workspace
 logs/quotes.json
 bffquotes.txt
+user_code/Brendan/BffQuotes.js
+user_code/Brendan/bffquotes.json
+user_code/Brendan/chatlog.js
+user_code/Brendan/mentionalerts.js
+user_code/Brendan/presenceAlerts.js
+user_code/Brendan/voiceUpdates.js
