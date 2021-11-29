@@ -13,3 +13,5 @@ logs/quotes.json
 .env
 /user_code/quotes.json
 CSBot.code-workspace
+logs/quotes.json
+bffquotes.txt
