@@ -40,8 +40,9 @@ async function removeRating(message, client) {
         if (err) throw err;
         
         // If the prof exists, open the reviews within
-        if (data.includes(profName)) {    
-            fs.readFile('./logs/professors/' + viewprofName.toLowerCase() + '.txt', function (err, data) {
+        if (data.includes(profName)) {
+            let file = `./logs/professors/${viewprofName.toLowerCase()}.txt`   
+            fs.readFile(file, function (err, data) {
                 if (err) throw err;
                 // Split the file into a string array on "\n\n"
                 let reviews = data.split("\n\n");
@@ -50,12 +51,13 @@ async function removeRating(message, client) {
                     message.channel.send("No reviews exist for this professor.");
                     return;
                 }
-                // If the reviewIndex provided is invalid
+                // If the reviewIndex provided is invalid, return
                 if (reviewIndex < 0 || reviewIndex > reviews.length - 1) {
                     message.channel.send("Invalid index.");
                     return;
                 }
-                approveRemoval(message, reviews[reviewIndex], reviewIndex, client, profName);
+                // Else, reviewIndex is valid: invoke approveRemoval
+                approveRemoval(message, reviews[reviewIndex], reviewIndex, client, file, profName);
             });
         } else {
             message.channel.send("Invalid professor. Please format as !removep professor_name review_index");
@@ -64,7 +66,36 @@ async function removeRating(message, client) {
 }
 
 async function approveRemoval(message, review, index, client, file, profname) {
-    // TO-DO
+    client.channels.cache.get(`${contentapprovalchannel}`).send(`Request to remove review for ${profname} ---> `+ review)
+        .then(function (message) {
+            message.react('👍').then(() => message.react('👎'));
+
+            var modUsers = {}
+            message.guild.roles.cache.forEach(role => modUsers[role.name] = role.members);
+
+            var modIds = [];
+            modUsers[modrole].forEach(user => modIds.push(user['id']));
+            const filter = (reaction, user) => {
+                return ['👍', '👎'].includes(reaction.emoji.name) && modIds.includes(user.id);
+            };
+
+            message.awaitReactions(filter, { max: 1 })
+                .then(collected => {
+                    const reaction = collected.first();
+
+                    if (reaction.emoji.name === '👍') 
+                    {
+                        message.channel.send('You have approved the request to remove the review!');
+                        console.log('Removing review from '+file+'--->'+review);
+                        // TO-DO remove file
+                    } 
+                    else 
+                    {
+                        message.channel.send('You have disapproved the request to remove the review');
+                        return;
+                    }
+                })
+        });
 }
 
 //Code for approving a new professor review
