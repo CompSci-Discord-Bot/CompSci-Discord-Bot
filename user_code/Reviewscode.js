@@ -89,7 +89,7 @@ async function approveRemoval(message, review, index, client, file, profname) {
                     {
                         message.channel.send('You have approved the request to remove the review!');
                         console.log('Removing review from '+file+'--->'+review);
-                        // TO-DO remove review from file
+                        // TO-DO actually remove review from file
                     } 
                     else 
                     {
