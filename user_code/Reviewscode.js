@@ -27,23 +27,55 @@ async function RateProfessor(message, client)
     });
 }
 
-// Code to submit a request to remove a professor review by index
+// Code to submit a request to remove a professor review by review index
 async function removeRating(message, client) {
+    // Formatting: !removep professor_name review_index
+    var args = message.content.split(" "); 
 
-    var arg = message.content.slice(8).trim(); // Removes the !removep from the message
-    var args = arg.split(" "); // Formatting: !removep professor_name index
-    var profName = args[0];
-    var reviewIndex = parseInt(args[1]) + 1; // + 1 offset to filter first line from file
+    if (args.length != 3) {
+        message.channel.send("Invalid formatting");
+        return;
+    }
 
-    // Open file of valid professors
+    var profName = args[1];
+    var reviewIndex = parseInt(args[2]) + 1; // + 1 offset to filter first line from file
+
+    // Attempt to open file of professor
+    let file = `./logs/professors/${profName.toLowerCase()}.txt`;
+
+    fs.readFile(file, function (err, data) {
+        if (err) {
+            message.channel.send("This professor name is invalid. Please format as !removep professor_name review_index.");
+            return;
+        }  
+        // Split the file into a string array on "\n\n"
+        let reviews = data.split("\n\n");
+        // If the file only contains "Student Ratings for....", return
+        if (reviews.length <= 1) {
+            message.channel.send("No reviews exist for this professor.");
+            return;
+        }
+        // If the reviewIndex provided is invalid, return
+        if (reviewIndex < 0 || reviewIndex > reviews.length - 1) {
+            message.channel.send("Invalid index.");
+            return;
+        }
+        // Else, reviewIndex is valid: invoke approveRemoval
+        approveRemoval(message, reviews[reviewIndex], reviewIndex, client, file, profName);
+    });
+}
+
+
+
+
+
     fs.readFile('./logs/professors/professors.txt', function (err, data) {
         if (err) throw err;
         
         // If the prof exists, open the reviews within
         if (data.includes(profName)) {
-            let file = `./logs/professors/${viewprofName.toLowerCase()}.txt`   
+            let file = `./logs/professors/${profName.toLowerCase()}.txt`   
             fs.readFile(file, function (err, data) {
-                if (err) throw err;
                 // Split the file into a string array on "\n\n"
                 let reviews = data.split("\n\n");
                 // If the file only contains "Student Ratings for....", return
@@ -60,7 +92,7 @@ async function removeRating(message, client) {
                 approveRemoval(message, reviews[reviewIndex], reviewIndex, client, file, profName);
             });
         } else {
-            message.channel.send("Invalid professor. Please format as !removep professor_name review_index");
+            message.channel.send("Invalid professor. ");
         };
     })
 }
