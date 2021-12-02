@@ -27,15 +27,44 @@ async function RateProfessor(message, client)
     });
 }
 
-// Code to remove a professor review by index
-async function RemoveRating(message, client) {
-    
+// Code to submit a request to remove a professor review by index
+async function removeRating(message, client) {
+
     var arg = message.content.slice(8).trim(); // Removes the !removep from the message
-    var args = arg.split(" "); // Appropriate formatting will be: !removep professor_name index
+    var args = arg.split(" "); // Formatting: !removep professor_name index
     var profName = args[0];
-    var reviewIndex = args[1];
+    var reviewIndex = parseInt(args[1]) + 1; // + 1 offset to filter first line from file
 
+    // Open file of valid professors
+    fs.readFile('./logs/professors/professors.txt', function (err, data) {
+        if (err) throw err;
+        
+        // If the prof exists, open the reviews within
+        if (data.includes(profName)) {    
+            fs.readFile('./logs/professors/' + viewprofName.toLowerCase() + '.txt', function (err, data) {
+                if (err) throw err;
+                // Split the file into a string array on "\n\n"
+                let reviews = data.split("\n\n");
+                // If the file only contains "Student Ratings for....", return
+                if (reviews.length < 2) {
+                    message.channel.send("No reviews exist for this professor.");
+                    return;
+                }
+                // If the reviewIndex provided is invalid
+                if (reviewIndex < 0 || reviewIndex > reviews.length - 1) {
+                    message.channel.send("Invalid index.");
+                    return;
+                }
+                approveRemoval(message, reviews[reviewIndex], reviewIndex, client, profName);
+            });
+        } else {
+            message.channel.send("Invalid professor. Please format as !removep professor_name review_index");
+        };
+    })
+}
 
+async function approveRemoval(message, review, index, client, file, profname) {
+    // TO-DO
 }
 
 //Code for approving a new professor review
