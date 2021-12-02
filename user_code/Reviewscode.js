@@ -27,6 +27,8 @@ async function RateProfessor(message, client)
     });
 }
 
+// Code to 
+
 //Code for approving a new professor review
 async function approveReview(message, review, client, file, profname) 
 {
