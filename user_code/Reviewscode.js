@@ -27,7 +27,16 @@ async function RateProfessor(message, client)
     });
 }
 
-// Code to 
+// Code to remove a professor review by index
+async function RemoveRating(message, client) {
+    
+    var arg = message.content.slice(8).trim(); // Removes the !removep from the message
+    var args = arg.split(" "); // Appropriate formatting will be: !removep professor_name index
+    var profName = args[0];
+    var reviewIndex = args[1];
+
+
+}
 
 //Code for approving a new professor review
 async function approveReview(message, review, client, file, profname) 
