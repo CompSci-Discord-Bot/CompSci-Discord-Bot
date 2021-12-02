@@ -65,6 +65,8 @@ async function removeRating(message, client) {
     })
 }
 
+// Review request to remove a review
+// Provided the message, the review contents, the index of the review, client, file, and profName
 async function approveRemoval(message, review, index, client, file, profname) {
     client.channels.cache.get(`${contentapprovalchannel}`).send(`Request to remove review for ${profname} ---> `+ review)
         .then(function (message) {
@@ -87,7 +89,7 @@ async function approveRemoval(message, review, index, client, file, profname) {
                     {
                         message.channel.send('You have approved the request to remove the review!');
                         console.log('Removing review from '+file+'--->'+review);
-                        // TO-DO remove file
+                        // TO-DO remove review from file
                     } 
                     else 
                     {
@@ -122,7 +124,7 @@ async function approveReview(message, review, client, file, profname)
                     {
                         message.channel.send('You have approved the review!');
                         console.log('Appending review to '+file+'--->'+review); //DO NOT REMOVE THIS CONSOLE LOG!
-                        fs.appendFile(`${file}`,"\n"+"\n"+JSON.stringify(`${review}`), 'utf8', (err) => {
+                        fs.appendFileappendFile(`${file}`,"\n"+"\n"+JSON.stringify(`${review}`), 'utf8', (err) => {
                             if (err) throw err;
                         });
                     } 
