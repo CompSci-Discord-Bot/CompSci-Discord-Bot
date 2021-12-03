@@ -33,35 +33,51 @@ async function removeRating(message, client) {
     var args = message.content.split(" "); 
 
     if (args.length != 3) {
-        message.channel.send("Invalid formatting");
+        message.channel.send("Invalid formatting. Please format as !removep professor_name review_index.");
         return;
     }
 
     var profName = args[1];
-    var reviewIndex = parseInt(args[2]) + 1; // + 1 offset to filter first line from file
-
+    var reviewIndex = parseInt(args[2]);
+    
     // Attempt to open file of professor - lowercase necessary
     let file = `./logs/professors/${profName.toLowerCase()}.txt`;
 
     fs.readFile(file, function (err, data) {
+
         if (err) {
-            message.channel.send("This professor name is invalid. Please format as !removep professor_name review_index.");
+            message.channel.send("This professor name is invalid.");
             return;
         }  
-        // Split the file into a string array on "\n\n"
-        let reviews = data.split("\n\n");
+        // Split the file into a string array on "\n"
+        // This will include white space entires
+        var tmpReviews = data.toString().split("\n");
+
+        // Clean up the tmpReviews array into only reviews
+        var reviews = [];
+
+        for (var i = 1; i < tmpReviews.length; i++) {
+            if (tmpReviews[i].trim() === "") {
+                continue;
+            }
+            reviews.push(tmpReviews[i]);
+        }
+
         // If the file only contains "Student Ratings for....", return
-        if (reviews.length <= 1) {
+        if (reviews.length == 0) {
             message.channel.send("No reviews exist for this professor.");
             return;
         }
+
         // If the reviewIndex provided is invalid, return
         if (reviewIndex < 0 || reviewIndex > reviews.length - 1) {
-            message.channel.send("Invalid index.");
+            message.channel.send("Invalid index provided; reviews begin at index 0.");
             return;
         }
         // Else, reviewIndex is valid: invoke approveRemoval
-        approveRemoval(reviews[reviewIndex], client, file, profName);
+        // TEMPORARY DEBUG
+        message.channel.send(`Review to be removed identified as ${reviews[reviewIndex]}`);
+        // THIS IS TO-DO approveRemoval(reviews[reviewIndex], client, file, profName);
     });
 }
 
@@ -91,7 +107,7 @@ async function approveRemoval(review, client, file, profname) {
                         console.log('Removing review from '+file+'--->'+review);
                         fs.readFile(file, function (err, data) {
                             if (err) throw error
-                            let reviews = data.split("\n\n");
+                            let reviews = data.toString().split("\n\n");
                             for (var i = 1; i < tmp_reviews.length; i++) {
                                 // Normalized used due to: www.javascripttutorial.net/string/javascript-string-equals/
                                 if (reviews[i].normalize() === review.normalize()) {
