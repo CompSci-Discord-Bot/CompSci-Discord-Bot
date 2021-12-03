@@ -61,14 +61,14 @@ async function removeRating(message, client) {
             return;
         }
         // Else, reviewIndex is valid: invoke approveRemoval
-        approveRemoval(message, reviews[reviewIndex], reviewIndex, client, file, profName);
+        approveRemoval(reviews[reviewIndex], client, file, profName);
     });
 }
 
 // Review request to remove a review
 // Provided the message, the review contents, the index of the review, client, file, and profName
-async function approveRemoval(message, review, index, client, file, profname) {
-    client.channels.cache.get(`${contentapprovalchannel}`).send(`Request to remove review for ${profname} ---> `+ review)
+async function approveRemoval(review, client, file, profname) {
+    client.channels.cache.get(`${contentapprovalchannel}`).send(`Request to remove review for ${profname} ---> ${review}`)
         .then(function (message) {
             message.react('👍').then(() => message.react('👎'));
 
@@ -89,7 +89,18 @@ async function approveRemoval(message, review, index, client, file, profname) {
                     {
                         message.channel.send('You have approved the request to remove the review!');
                         console.log('Removing review from '+file+'--->'+review);
-                        // TO-DO actually remove review from file
+                        fs.readFile(file, function (err, data) {
+                            if (err) throw error
+                            let reviews = data.split("\n\n");
+                            for (var i = 1; i < tmp_reviews.length; i++) {
+                                // Normalized used due to: www.javascripttutorial.net/string/javascript-string-equals/
+                                if (reviews[i].normalize() === review.normalize()) {
+                                    // The review to be removed has been identified
+                                    // TO-DO, remove from file
+                                }
+
+                            }
+                        });
                     } 
                     else 
                     {
