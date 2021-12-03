@@ -98,16 +98,22 @@ async function approveRemoval(review, client, file, profname) {
                             // The review is confirmed to exist in the message again, and the index found from review contents
                             // This is to prevent issues if file was modified after request was placed
                             let reviews = parseReviewsToArr(data)
+                            var reviewFound = false; // To prevent removing duplicates and to inform in case of error
                             var newFile = "";
                             for (var i = 0; i < reviews.length; i ++) {
-                                if (reviews[i] === review) {
+                                if (reviews[i] === review && !reviewFound) {
+                                    reviewFound = true;
                                     continue;
                                 }
                                 newFile += reviews[i] + "\n\n";
                             }
+                            if (!reviewFound) {
+                                message.channel.send('The review was not found in the file, it may have been removed since the request was placed.');
+                            } else {
                             fs.writeFile(file, newFile, 'utf8', (err) => {
                                 if (err) throw err;
                             });
+                        }
                         });
                     } 
                     else 
@@ -131,7 +137,7 @@ function parseReviewsToArr(data) {
         }
         reviews.push(tmpReviews[i]);
     }
-    
+
     return reviews;
 }
 
