@@ -24,7 +24,7 @@ const NewChannel = require("./user_code/NewChannel");
 
 
 //THIS CONST BRENDAN LINE MUST BE COMMENTED OUT IF IN DEVELOPMENT MODE.  IT WILL WORK PROPERLY WITH JUST THIS LINE COMMENTED OUT WHEN DEVELOPING.
-const Brendan = require("./user_code/Brendan");
+//const Brendan = require("./user_code/Brendan");
 
 // var softkill = false;
 // var bypass = false;
@@ -78,13 +78,18 @@ client.on("message", message =>
   }
 
   //ID for CompSci server only
-  compareServer(message, '707293853958275125', RETURN => {
+  compareServer(message, '776136631593598976', RETURN => {
 
     //Adds a professor rating to file after mod review
     command(message, 'ratep', RETURN => {
       ReviewsCode.RateProfessor(message, client);
     })
     
+    //Adds a professor rating to file after mod review
+    command(message, 'removep', RETURN => {
+      ReviewsCode.removeRating(message, client);
+    })
+
     //Lists all the ratings for a specified professor that have already been approved by a mod
     command(message, 'viewratings', RETURN => {
       ReviewsCode.viewRatings(message);
@@ -140,7 +145,7 @@ client.on("message", message =>
 /*==========================================================================================================
       Anything below this point  will work on ANY and ALL servers the bot is currently apart of
  ==========================================================================================================*/
-  Brendan.filter(message);
+  // Brendan.filter(message);
 
   command(message, 'rolelist', RETURN => { 
     const Role = message.guild.roles.cache.find(role => role.name == "Bot");
@@ -208,8 +213,8 @@ client.on("message", message =>
 
   if(`${devstate}`=='false') //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
   {
-    Brendan.mentions(client, message);
-    Brendan.chatlogger(client, message);
+   // Brendan.mentions(client, message);
+  //  Brendan.chatlogger(client, message);
     
     if((message.channel.id === `${maincsquoteschannel}`)||(message.channel.id === `${moddiscussion}`))
       Quotescode.quotecatcher(message, client);
@@ -265,8 +270,8 @@ client.on("message", message =>
 
 //Private module used for Brendan's private quotes pointed to Alerts
   compareServer(message, '858812074813423696', RETURN => { 
-    if(`${devstate}`=='false')
-      Brendan.PrivateQuotes(message, client);
+    //if(`${devstate}`=='false')
+      //Brendan.PrivateQuotes(message, client);
   });
 
 }); //End of message sent loop
@@ -281,7 +286,7 @@ if(`${devstate}`=='false')
 
   //Fires when users updates their user status presence and logs that status in a specific text channel
   client.on('presenceUpdate', async (oldPresence, newPresence) => {
-    Brendan.presence(oldPresence, newPresence);
+   // Brendan.presence(oldPresence, newPresence);
   });
 
   //Fires when a new text channel is created on any server
@@ -291,7 +296,7 @@ if(`${devstate}`=='false')
 
   //Fires when the status of voice activity changes (I.E. When someone joins a vc, leaves a vc, or switches vc)
   client.on('voiceStateUpdate', (oldState, newState) => {
-    Brendan.voiceupdates(newState, oldState, client);
+   // Brendan.voiceupdates(newState, oldState, client);
   });
 }
 

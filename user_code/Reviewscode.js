@@ -183,4 +183,4 @@ async function viewRatings(message)
 }
 
 
-module.exports = { RateProfessor, approveReview, viewRatings };
+module.exports = { RateProfessor, approveReview, removeRating, approveRemoval, viewRatings };

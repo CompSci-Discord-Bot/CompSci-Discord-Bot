@@ -1,6 +1,6 @@
 {
-    "mainbotstatuschannel":"864807372927926273",
-    "devbotstatuschannel":"838150077834854411",
+    "mainbotstatuschannel":"916177428664156160",
+    "devbotstatuschannel":"916177428664156160",
     
     "maincsquoteschannel":"808161527373758464",
     "devcsquoteschannel":"838149486353842198",
@@ -8,14 +8,14 @@
     "contentapprovalchannel": "812908299442847774",
     "devcontentapprovalchannel":"841424759128588369",
     
-    "brendanid":"404717378715385856",
+    "brendanid":"268567699318112259",
     "devid":"355928972917211147",
     "chiaraid":"355928972917211147",
     
-    "generalchat":"707293854507991172",
-    "proftalkchannel":"763174691866148884",
-    "botcommands":"773327643574796288",
-    "moddiscussion":"784979554531540992",
+    "generalchat":"916177428664156160",
+    "proftalkchannel":"916177428664156160",
+    "botcommands":"916177428664156160",
+    "moddiscussion":"916177428664156160",
     "modbotcommands":"784963943726448691",
     "chatloggerchannel":"858822539514085417",
 
