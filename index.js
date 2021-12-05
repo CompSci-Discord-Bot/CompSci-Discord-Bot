@@ -77,8 +77,8 @@ client.on("message", message =>
       return;
   }
 
-  //ID for CompSci server only
-  compareServer(message, '707293853958275125', RETURN => {
+  //ID for CompSci server only, UNLESS devstate is enabled
+  compareServer(message, '707293853958275125', `${devstate}`, RETURN => {
 
     //Adds a professor rating to file after mod review
     command(message, 'ratep', RETURN => {
@@ -145,7 +145,7 @@ client.on("message", message =>
 /*==========================================================================================================
       Anything below this point  will work on ANY and ALL servers the bot is currently apart of
  ==========================================================================================================*/
-  if(`${devstate}`=='false')
+  if(`${devstate}` == 'false')
     Brendan.filter(message);
 
   command(message, 'rolelist', RETURN => { 
@@ -273,7 +273,7 @@ client.on("message", message =>
 
 
 //Private module used for Brendan's private quotes pointed to Alerts
-  compareServer(message, '858812074813423696', RETURN => { 
+  compareServer(message, '858812074813423696', `${devstate}`, RETURN => { 
     if(`${devstate}`=='false')
       Brendan.PrivateQuotes(message, client);
   });
