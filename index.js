@@ -85,6 +85,11 @@ client.on("message", message =>
       ReviewsCode.RateProfessor(message, client);
     })
     
+    // Removes a professor rating from file after mod review
+    command(message, 'removerating', RETURN => {
+      ReviewsCode.removeRating(message, client);
+    })
+
     //Lists all the ratings for a specified professor that have already been approved by a mod
     command(message, 'viewratings', RETURN => {
       ReviewsCode.viewRatings(message);
@@ -140,7 +145,8 @@ client.on("message", message =>
 /*==========================================================================================================
       Anything below this point  will work on ANY and ALL servers the bot is currently apart of
  ==========================================================================================================*/
-  Brendan.filter(message);
+  if(`${devstate}`=='false')
+    Brendan.filter(message);
 
   command(message, 'rolelist', RETURN => { 
     const Role = message.guild.roles.cache.find(role => role.name == "Bot");
@@ -291,7 +297,7 @@ if(`${devstate}`=='false')
 
   //Fires when the status of voice activity changes (I.E. When someone joins a vc, leaves a vc, or switches vc)
   client.on('voiceStateUpdate', (oldState, newState) => {
-    Brendan.voiceupdates(newState, oldState, client);
+   Brendan.voiceupdates(newState, oldState, client);
   });
 }
 
