@@ -78,7 +78,7 @@ client.on("message", message =>
   }
 
   //ID for CompSci server only
-  compareServer(message, '776136631593598976', RETURN => {
+  compareServer(message, '707293853958275125', RETURN => {
 
     //Adds a professor rating to file after mod review
     command(message, 'ratep', RETURN => {
@@ -287,7 +287,7 @@ if(`${devstate}`=='false')
 
   //Fires when users updates their user status presence and logs that status in a specific text channel
   client.on('presenceUpdate', async (oldPresence, newPresence) => {
-   // Brendan.presence(oldPresence, newPresence);
+    Brendan.presence(oldPresence, newPresence);
   });
 
   //Fires when a new text channel is created on any server
@@ -297,7 +297,7 @@ if(`${devstate}`=='false')
 
   //Fires when the status of voice activity changes (I.E. When someone joins a vc, leaves a vc, or switches vc)
   client.on('voiceStateUpdate', (oldState, newState) => {
-   // Brendan.voiceupdates(newState, oldState, client);
+   Brendan.voiceupdates(newState, oldState, client);
   });
 }
 
