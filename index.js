@@ -202,9 +202,12 @@ client.on("message", message =>
       Administrative.ban(message);
     })
 
-    command(message, 'createroles', RETURN => {
-      Channelcreator.rolecreator(message);
-    })
+    if((message.author.id === `${brendanid}`) || (`${devstate}`=='false'))
+    {
+      command(message, 'createroles', RETURN => {
+        Channelcreator.rolecreator(message);
+      })
+    }
 
   //Softkill function command call (Calls the reverse of the status of softkill)
   // if(message.content === `${prefix}softkill`) 
