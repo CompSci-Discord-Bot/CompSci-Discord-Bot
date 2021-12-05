@@ -70,7 +70,7 @@ async function approveRemoval(incommingMessageObject, review, client, file, prof
                     {
                         message.channel.send('You have approved the request to remove the review!');
                         console.log('Removing review from '+file+'--->'+review);
-                        incommingMessageObject.channel.send('Review removal for '+file+' Accepted!');
+                        incommingMessageObject.channel.send('Review removal for '+profname+' Accepted!');
                         fs.readFile(file, function (err, data) {
                             // The review is confirmed to exist in the message again, and the index found from review contents
                             // This is to prevent issues if file was modified after request was placed
@@ -96,7 +96,7 @@ async function approveRemoval(incommingMessageObject, review, client, file, prof
                     else 
                     {
                         message.channel.send('You have disapproved the request to remove the review');
-                        incommingMessageObject.channel.send('Review removal for '+file+' Denied!');
+                        incommingMessageObject.channel.send('Review removal for '+profname+' Denied!');
                         return;
                     }
                 })
@@ -167,7 +167,7 @@ async function approveReview(incommingMessageObject, review, client, file, profn
                     {
                         message.channel.send('You have approved the review!');
                         console.log('Appending review to '+file+'--->'+review); //DO NOT REMOVE THIS CONSOLE LOG!
-                        incommingMessageObject.channel.send('Review for '+file+' Accepted!');
+                        incommingMessageObject.channel.send('Review for '+profname+' Accepted!');
                         fs.appendFile(`${file}`,"\n"+"\n"+JSON.stringify(`${review}`), 'utf8', (err) => {
                             if (err) throw err;
                         });
@@ -176,7 +176,7 @@ async function approveReview(incommingMessageObject, review, client, file, profn
                     {
                         message.channel.send('You have disapproved the review.');
                         file = ('./logs/professors/trashdump.txt').toString().split("\n");
-                        incommingMessageObject.channel.send('Review for '+file+' Denied!');
+                        incommingMessageObject.channel.send('Review for '+profname+' Denied!');
                         fs.appendFile(`${file}`,"\n"+`Declined review for ${profname} ---> `+JSON.stringify(`${review}`), 'utf8', (err) => {
                             if (err) throw err;
                         });
