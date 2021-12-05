@@ -24,7 +24,7 @@ const NewChannel = require("./user_code/NewChannel");
 
 
 //THIS CONST BRENDAN LINE MUST BE COMMENTED OUT IF IN DEVELOPMENT MODE.  IT WILL WORK PROPERLY WITH JUST THIS LINE COMMENTED OUT WHEN DEVELOPING.
-//const Brendan = require("./user_code/Brendan");
+const Brendan = require("./user_code/Brendan");
 
 // var softkill = false;
 // var bypass = false;
