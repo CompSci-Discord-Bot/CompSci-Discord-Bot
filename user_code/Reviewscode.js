@@ -1,5 +1,6 @@
 //Reviewscode.js
 const { modrole, contentapprovalchannel, proftalkchannel, modbotcommands, botcommands }= require('../ids.json');
+const { devstate }= require('../config.json');
 const fs = require('fs');
 let jsonData = "";
 
@@ -185,7 +186,7 @@ async function approveReview(message, review, client, file, profname)
 //Code to retrieve all written professor ratings from their respective txt file and list them in Discord
 async function viewRatings(message) 
 {   
-    if((message.channel.id === `${proftalkchannel}`) || (message.channel.id === `${botcommands}`)|| (message.channel.id === `${modbotcommands}`))
+    if((message.channel.id === `${proftalkchannel}`) || (message.channel.id === `${botcommands}`)|| (message.channel.id === `${modbotcommands}`) || (`${devstate}` == 'true'))
     {
         var viewprofName = message.content.slice(12).trim().toString();
         if (viewprofName.localeCompare("")==0)
