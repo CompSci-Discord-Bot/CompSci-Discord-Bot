@@ -27,6 +27,120 @@ async function RateProfessor(message, client)
     });
 }
 
+
+// Code to submit a request to remove a professor review by review index
+async function removeRating(message, client) {
+    // Formatting: !removerating professor_name review_index
+    var args = message.content.split(" "); 
+
+    if (args.length != 3) {
+        message.channel.send("Invalid formatting. Please format as !removerating professor_name review_index.");
+        return;
+    }
+
+    var profName = args[1];
+    var reviewIndex = parseInt(args[2]) + 1; // Shift necessary due to first line of file
+    
+    // Attempt to open file of professor - lowercase necessary
+    let file = `./logs/professors/${profName.toLowerCase()}.txt`;
+
+    fs.readFile(file, function (err, data) {
+        if (err) {
+            message.channel.send("This professor name is invalid.");
+            return;
+        }  
+        // Split the file into a string array on "\n"
+        // This will include white space entires
+        let reviews = parseReviewsToArr(data);
+
+        // If the file only contains "Student Ratings for....", return
+        if (reviews.length <= 1) {
+            message.channel.send("No reviews exist for this professor.");
+            return;
+        }
+
+        // If the reviewIndex provided is invalid, return
+        if (reviewIndex < 1 || reviewIndex > reviews.length) {
+            message.channel.send("Invalid index provided; reviews begin at index 0.");
+            return;
+        }
+        // Else, reviewIndex is valid: invoke approveRemoval
+        message.channel.send(`Submitting request to remove review: ${reviews[reviewIndex]}`);
+        approveRemoval(reviews[reviewIndex], client, file, profName);
+    });
+}
+
+/* Review request to remove a review
+// Provided the message, the review contents, the index of the review, client, file, and profName */
+async function approveRemoval(review, client, file, profname) {
+    client.channels.cache.get(`${contentapprovalchannel}`).send(`Request to remove review for ${profname} ---> ${review}`)
+        .then(function (message) {
+            message.react('👍').then(() => message.react('👎'));
+
+            var modUsers = {}
+            message.guild.roles.cache.forEach(role => modUsers[role.name] = role.members);
+
+            var modIds = [];
+            modUsers[modrole].forEach(user => modIds.push(user['id']));
+            const filter = (reaction, user) => {
+                return ['👍', '👎'].includes(reaction.emoji.name) && modIds.includes(user.id);
+            };
+
+            message.awaitReactions(filter, { max: 1 })
+                .then(collected => {
+                    const reaction = collected.first();
+
+                    if (reaction.emoji.name === '👍') 
+                    {
+                        message.channel.send('You have approved the request to remove the review!');
+                        console.log('Removing review from '+file+'--->'+review);
+                        fs.readFile(file, function (err, data) {
+                            // The review is confirmed to exist in the message again, and the index found from review contents
+                            // This is to prevent issues if file was modified after request was placed
+                            let reviews = parseReviewsToArr(data)
+                            var reviewFound = false; // To prevent removing duplicates and to inform in case of error
+                            var newFile = "";
+                            for (var i = 0; i < reviews.length; i ++) {
+                                if (reviews[i] === review && !reviewFound) {
+                                    reviewFound = true;
+                                    continue;
+                                }
+                                newFile += reviews[i] + "\n\n";
+                            }
+                            if (!reviewFound) {
+                                message.channel.send('The review was not found in the file, it may have been removed since the request was placed.');
+                            } else {
+                            fs.writeFile(file, newFile, 'utf8', (err) => {
+                                if (err) throw err;
+                            });
+                        }
+                        });
+                    } 
+                    else 
+                    {
+                        message.channel.send('You have disapproved the request to remove the review');
+                        return;
+                    }
+                })
+        });
+}
+
+// Provided data which are reviews separated by a new line character, return a clean array of string reviews
+function parseReviewsToArr(data) {
+    var tmpReviews = data.toString().split("\n");
+
+    // Clean up the tmpReviews array into only reviews
+    var reviews = [];
+    for (var i = 0; i < tmpReviews.length; i++) {
+        if (tmpReviews[i].trim() === "") {
+            continue;
+        }
+        reviews.push(tmpReviews[i]);
+    }
+
+    return reviews;
+}
+
 //Code for approving a new professor review
 async function approveReview(message, review, client, file, profname) 
 {
@@ -99,4 +213,4 @@ async function viewRatings(message)
 }
 
 
-module.exports = { RateProfessor, approveReview, viewRatings };
+module.exports = { RateProfessor, approveReview, removeRating, approveRemoval, viewRatings };
