@@ -14,9 +14,7 @@ async function quote(message)
 {
     var quotes2 = jsonData.teacherQuotes;
     var filteredQuotes = []
-    console.log(message.content);
-
-    if(message.content.length > 6) //Runs if seaching for a specific keyword ONLY
+    if (message.content.length > 6) 
     {
         var search = message.content.replace("!quote ", "");
 

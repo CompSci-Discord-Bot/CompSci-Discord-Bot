@@ -1,5 +1,6 @@
 //Reviewscode.js
 const { modrole, contentapprovalchannel, proftalkchannel, modbotcommands, botcommands }= require('../ids.json');
+const Entertainment = require("./Entertainment");
 const fs = require('fs');
 let jsonData = "";
 
@@ -68,8 +69,30 @@ async function approveReview(message, review, client, file, profname)
         });
 }
 
+function collectRatings(char_count, num, arr) {
+    var out;
+    var temp = char_count;
+    offset = 2;
+    for (e = 0; e < num; e++) {
+        out = "";
+        char_count = temp;
+        for (i = offset; i < arr.length && char_count < 500; i++) 
+        {
+            if (char_count + arr[i] >= 500) break;
+            if (e > 0) console.log(i);
+            if (arr[i]) 
+            {
+                out = out + "\n" + arr[i];
+                char_count = out.length;
+            }
+            offset++
+        }
+    }
+    return out;
+}
+
 //Code to retrieve all written professor ratings from their respective txt file and list them in Discord
-async function viewRatings(message) 
+async function viewRatings(message, Discord)
 {   
     if((message.channel.id === `${proftalkchannel}`) || (message.channel.id === `${botcommands}`)|| (message.channel.id === `${modbotcommands}`))
     {
@@ -83,6 +106,48 @@ async function viewRatings(message)
         {
             if (err) throw err;
             if(data.includes(viewprofName.toLowerCase())){
+                fs.readFile('./logs/professors/' + viewprofName.toLowerCase() + '.txt', 'utf8', function(err, data) {
+                    if (err) throw err;
+
+                    var arr = data.split("\n");
+                    
+                    
+                    var titleout = "Ratings for Professor " + viewprofName;
+                    var char_count = titleout.length;
+                    var out = collectRatings(char_count, 1, arr);
+
+                    const author = message.author;
+                    
+                    message.channel.send(Entertainment.embed(Discord, titleout, 'Almighty CompSci', '34EB5E', 'Page 1', out)).then(message => {
+                        let page = 1;
+
+                        if (collectRatings(char_count, page+1, arr)) message.react('➡️')
+
+                        const collector = message.createReactionCollector(
+                            // only collect left and right arrow reactions from the message author
+                            (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && user.id === author.id,
+                            // time out after a minute
+                            {time: 60000}
+                        )
+
+                        collector.on('collect', reaction => {
+                            // remove the existing reactions
+                            message.reactions.removeAll().then(async () => {
+                                // increase/decrease index
+                                reaction.emoji.name === '⬅️' ? page -= 1 : page += 1
+                                char_count = titleout.length;
+                                console.log(collectRatings(char_count, page, arr));
+                                // edit message with new embed
+                                message.edit(Entertainment.embed(Discord, titleout, 'Almighty CompSci', '34EB5E', `Page ${page}`, collectRatings(char_count, page, arr)))
+                                // react with left arrow if it isn't the start (await is used so that the right arrow always goes after the left)
+                                if (collectRatings(char_count, page-1, arr)) await message.react('⬅️')
+                                // react with right arrow if it isn't the end
+                                if (collectRatings(char_count, page+1, arr)) message.react('➡️')
+                            })
+                        })
+                    });
+                });
+                //message.channel.send("Ratings for Professor " + viewprofName, { files: ['./logs/professors/' + viewprofName.toLowerCase() + '.txt'] });
                 message.channel.send("Ratings for Professor " + viewprofName, { files: ['./logs/professors/' + viewprofName.toLowerCase() + '.txt'] });
             }
             else 

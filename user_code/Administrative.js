@@ -168,6 +168,7 @@ async function mno(message) {
   }
 }
 
+
 async function lockChannel(message) 
 {
   var parameter = message.content.slice(10).trim();
