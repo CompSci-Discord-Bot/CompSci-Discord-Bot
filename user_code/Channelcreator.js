@@ -3,7 +3,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const readline = require('readline');
 const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
-const semester = ('Fall 2021')//CHANGE TO CURRENT SEMESTER
+const semester = ('Winter 2021')//CHANGE TO CURRENT SEMESTER
 
     // If CSV is parsing undefined, make sure first line is the fields for CSV,
     // not ---ComputerScience---, or it wont run
@@ -106,7 +106,7 @@ function createchannel(name, message,time)
                     channel.setParent(category.id);
                     return;
                 }   
-            })}).catch(console.error);        
+            })}).catch(console.error); 
 }
 
 //deletes all channels IN BOTCODE save for a few pre-recorded Id's
@@ -116,8 +116,9 @@ async function deletechannel(message)
 {
     message.guild.channels.cache.forEach(channel => {//delete ALL channels except hardcoded
         //ignores:references, github, devwork, classic-quotes,bot-status, voice, devtalk, content approval, and general
-        if((channel.id!==('823034099925123092') && channel.id!==('823034119167672340') && channel.id!==('823034112155189268') && channel.id!==('823034145868349470')&& channel.id!==('838150077834854411')&& channel.id!==('838149486353842198')&& channel.id!==('838195992624103475')&& channel.id!==('841873032011055114')&& channel.id!==('841424759128588369')&& channel.id!==('823034099925123092'))){
-        channel.delete()}});
+        if((channel.id!==('823034099925123092') && channel.id!==('823034119167672340') && channel.id!==('823034112155189268') && channel.id!==('823034145868349470')&& channel.id!==('838150077834854411')&& channel.id!==('838149486353842198')&& channel.id!==('838195992624103475')&& channel.id!==('841873032011055114')&& channel.id!==('841424759128588369')&& channel.id!==('823034099925123092') && channel.id!==('916782578659377222') && channel.id!==('916782522866729030'))){
+        channel.delete();
+        console.log('Delete all complete!');}});
 }
 
 //deletes ALL categories except hardcoded
