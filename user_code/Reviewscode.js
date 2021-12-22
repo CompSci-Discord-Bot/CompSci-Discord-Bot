@@ -186,6 +186,8 @@ async function approveReview(incommingMessageObject, review, client, file, profn
         });
 }
 
+
+//-----============== EVERYTHING BELOW THIS POINT IS FOR VIEWING RATINGS ONLY!  IT IS NOT USED FOR ANYTHING ELSE ==============-----
 // Code to retrieve all written professor ratings from their respective txt file and list them in Discord
 async function viewRatings(message) 
 {   
