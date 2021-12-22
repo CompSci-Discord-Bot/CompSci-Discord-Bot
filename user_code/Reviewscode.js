@@ -186,7 +186,9 @@ async function approveReview(incommingMessageObject, review, client, file, profn
         });
 }
 
-//Code to retrieve all written professor ratings from their respective txt file and list them in Discord
+
+//-----============== EVERYTHING BELOW THIS POINT IS FOR VIEWING RATINGS ONLY!  IT IS NOT USED FOR ANYTHING ELSE ==============-----
+// Code to retrieve all written professor ratings from their respective txt file and list them in Discord
 async function viewRatings(message) 
 {   
     if((message.channel.id === `${proftalkchannel}`) || (message.channel.id === `${botcommands}`)|| (message.channel.id === `${modbotcommands}`) || (`${devstate}` == 'true'))
@@ -200,13 +202,30 @@ async function viewRatings(message)
         fs.readFile('./logs/professors/professors.txt', function (err, data) 
         {
             if (err) throw err;
-            if(data.includes(viewprofName.toLowerCase())){
-                message.channel.send("Ratings for Professor " + viewprofName, { files: ['./logs/professors/' + viewprofName.toLowerCase() + '.txt'] });
+            // Parse data along new line into a list of strings
+            var professors = data.toString().split("\n");
+
+            // Iterate through each professor, find which most similar to user input
+            var maxSimilarityProf = ""
+            var maxSimilarityValue = 0
+
+            professors.forEach(professor => {
+                var similarityVal = similarity(professor.toLowerCase().trim(), viewprofName.toLowerCase().trim())
+                if (similarityVal > maxSimilarityValue) {
+                    maxSimilarityValue = similarityVal
+                    maxSimilarityProf = professor.trim()
+                }
+            });
+
+            // If exactly similar upload file
+            if (maxSimilarityValue == 1) message.channel.send("Ratings for Professor " + viewprofName, { files: ['./logs/professors/' + viewprofName.toLowerCase() + '.txt'] });
+            // If similarish to a professor, let the user know correct spelling and upload file
+            else if (maxSimilarityValue > 0.35) {
+                message.channel.send(`Sorry, **${viewprofName.toLowerCase()}** does not exist in our system! Did you mean **${maxSimilarityProf}**?`)
+                message.channel.send("Ratings for Professor " + maxSimilarityProf, { files: ['./logs/professors/' + maxSimilarityProf.toLowerCase() + '.txt'] });
             }
-            else 
-            {
-                message.channel.send("Sorry, that professor does not exist!")
-            }
+            // Otherwise, if not similar to anything, let them know
+            else message.channel.send(`Sorry, no professor with a name of or similar to **${viewprofName}** exists in our system!`)
         });
     }
     else
@@ -215,6 +234,50 @@ async function viewRatings(message)
         message.channel.send(`Command only allowed in prof-talk-and-suggestions and bot-commands`);
     }
 }
+
+// HELPER FUNCTIONS TO DETERMINE HOW SIMILAR A STRING IS TO ANOTHER STRING
+// https://stackoverflow.com/questions/10473745/compare-strings-javascript-return-of-likely
+// https://en.wikipedia.org/wiki/Levenshtein_distance
+function similarity(s1, s2) {
+    var longer = s1;
+    var shorter = s2;
+    if (s1.length < s2.length) {
+      longer = s2;
+      shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+      return 1.0;
+    }
+    return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+  }
+
+  function editDistance(s1, s2) {
+    s1 = s1.toLowerCase();
+    s2 = s2.toLowerCase();
+  
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+      var lastValue = i;
+      for (var j = 0; j <= s2.length; j++) {
+        if (i == 0)
+          costs[j] = j;
+        else {
+          if (j > 0) {
+            var newValue = costs[j - 1];
+            if (s1.charAt(i - 1) != s2.charAt(j - 1))
+              newValue = Math.min(Math.min(newValue, lastValue),
+                costs[j]) + 1;
+            costs[j - 1] = lastValue;
+            lastValue = newValue;
+          }
+        }
+      }
+      if (i > 0)
+        costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
+  }
 
 
 module.exports = { RateProfessor, approveReview, removeRating, approveRemoval, viewRatings };
