@@ -10,7 +10,7 @@ async function removeRating(message, client) {
     var args = message.content.split(" "); 
 
     if (args.length != 3) {
-        message.channel.send("Invalid formatting. Please format as !removerating professor_name review_index.");
+        message.channel.send(`**Error:** Invalid formatting.\nPlease format as \`${prefix}removerating professor_name review_index\``);
         return;
     }
 
