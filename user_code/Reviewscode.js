@@ -1,6 +1,6 @@
 //Reviewscode.js
 const { modrole, contentapprovalchannel, proftalkchannel, modbotcommands, botcommands }= require('../ids.json');
-const { devstate }= require('../config.json');
+const { prefix, devstate }= require('../config.json');
 const fs = require('fs');
 let jsonData = "";
 
@@ -129,7 +129,7 @@ async function RateProfessor(message, client)
 
     // This error will occur both if they didn't add a review or if they only inputed !ratep
     if (profName.trim() == "") {
-        message.channel.send(`**Error:** You must include a professor's name and a review.\nPlease use the format \`!ratep professor_name Type your review here\``)
+        message.channel.send(`**Error:** You must include a professor's name and a review.\nPlease use the format \`${prefix}ratep professor_name Type your review here\``)
         return
     }
 
@@ -209,7 +209,7 @@ async function viewRatings(message)
         var viewprofName = message.content.slice(12).trim().toString();
         if (viewprofName.localeCompare("") == 0)
         {
-            message.channel.send(`**Error:** You must include a professor's name.\nPlease use the format \`!viewratings professor_name\``)
+        message.channel.send(`**Error:** You must include a professor's name and a review.\nPlease use the format \`${prefix}ratep professor_name Type your review here\``)
             return;
         }
         
