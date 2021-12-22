@@ -3,7 +3,7 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const readline = require('readline');
 const { SSL_OP_TLS_BLOCK_PADDING_BUG } = require('constants');
-const semester = ('Winter 2021')//CHANGE TO CURRENT SEMESTER
+const semester = ('Winter 2022')//CHANGE TO CURRENT SEMESTER
 
     // If CSV is parsing undefined, make sure first line is the fields for CSV,
     // not ---ComputerScience---, or it wont run
@@ -70,10 +70,10 @@ function createchannel(name, message,time)
             var code=channel.name.substr(5,3); 
             
             //eliminates --Duplicate classes-- or --Online labs-- to 111 or 211 classes, as well as graduate classes
-            if(code.includes("112")||code.includes("212"))
-            {
-                channel.delete();//deletes them
-            }
+            // if(code.includes("112")||code.includes("212"))
+            // {
+            //     channel.delete();//deletes them
+            // }
 
             //Sets the channel topic of the channel to the class time.
             //Time grabbed from the passed in parameter time from csvparse function
@@ -87,26 +87,33 @@ function createchannel(name, message,time)
             //searches for a category that fits different specs to sort
             message.guild.channels.cache.forEach(category => 
             {
+                channel.createOverwrite(everyoneRole, {VIEW_CHANNEL: false})
+
                 //finds category COSC ELECTIVES and sorts the elective classes into them (all classes not in categories.txt)
-                if(category.type==='category'&& category.name.includes("COSC XXX Electives")&&(code.includes("321")||code.includes("374")||code.includes("423")||code.includes("426")||code.includes("436")||code.includes("444")||code.includes("457")||code.includes("461")||code.includes("462")||code.includes("472")||code.includes("473")||code.includes("480")||code.includes("439")||code.substr(0,1).includes("5")||code.substr(0,1).includes("6")))
+                if(category.type==='category'&& category.name.includes("COSC XXX Electives")&&(code.includes("321")||code.includes("374")||code.includes("423")||code.includes("426")||code.includes("436")||code.includes("444")||code.includes("457")||code.includes("461")||code.includes("462")||code.includes("472")||code.includes("473")||code.includes("480")||code.includes("439")))
                 {
                     channel.setParent(category.id);
+                    category.createOverwrite(everyoneRole, {VIEW_CHANNEL: false})
+                    return;
+                }
+                
+                if(category.type==='category'&& category.name.includes("COSC Mathematics Courses")&&(code.includes("107")||code.includes("120")||code.includes("360")))
+                {
+                    channel.setParent(category.id);
+                    category.createOverwrite(everyoneRole, {VIEW_CHANNEL: false})
                     return;
                 }
 
-                if(category.type==='category'&& category.name.includes("COSC Mathematics Courses")&&(name.includes("MATH 321")||name.includes("MATH 120")||name.includes("MATH 360")))
-                {
-                    channel.setParent(category.id);
-                    return;
-                }
 
                 //if category and class channel share same code (for most required and gen ed classes)
                 else if(category.type==='category'&& `${category.name}`.includes(code))
                 {
                     channel.setParent(category.id);
+                    category.createOverwrite(everyoneRole, {VIEW_CHANNEL: false})
                     return;
-                }   
-            })}).catch(console.error); 
+                }
+
+            })}).catch(console.error);        
 }
 
 //deletes all channels IN BOTCODE save for a few pre-recorded Id's
@@ -116,9 +123,8 @@ async function deletechannel(message)
 {
     message.guild.channels.cache.forEach(channel => {//delete ALL channels except hardcoded
         //ignores:references, github, devwork, classic-quotes,bot-status, voice, devtalk, content approval, and general
-        if((channel.id!==('823034099925123092') && channel.id!==('823034119167672340') && channel.id!==('823034112155189268') && channel.id!==('823034145868349470')&& channel.id!==('838150077834854411')&& channel.id!==('838149486353842198')&& channel.id!==('838195992624103475')&& channel.id!==('841873032011055114')&& channel.id!==('841424759128588369')&& channel.id!==('823034099925123092') && channel.id!==('916782578659377222') && channel.id!==('916782522866729030'))){
-        channel.delete();
-        console.log('Delete all complete!');}});
+        if((channel.id!==('823034099925123092') && channel.id!==('823034119167672340') && channel.id!==('823034112155189268') && channel.id!==('823034145868349470')&& channel.id!==('838150077834854411')&& channel.id!==('838149486353842198')&& channel.id!==('838195992624103475')&& channel.id!==('841873032011055114')&& channel.id!==('841424759128588369')&& channel.id!==('823034099925123092'))){
+        channel.delete()}});
 }
 
 //deletes ALL categories except hardcoded
@@ -142,7 +148,7 @@ async function rolecreator(message)
 
     readInterface.on('line', function(line) 
     {
-        var semester = ('Fall 2021')
+        var semester = ('Winter 2022')
         message.guild.roles.create({
             data: {
               name: `${line} ${semester}`,
