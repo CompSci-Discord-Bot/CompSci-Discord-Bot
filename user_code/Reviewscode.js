@@ -119,28 +119,41 @@ function parseReviewsToArr(data) {
     return reviews;
 }
 
-//Code to add a professor rating 
+// Code to add a professor rating 
 async function RateProfessor(message, client)
 {
+    // Remove !ratep from the message
     var arg = message.content.slice(6).trim();
-    var profname = (arg.substr(0,arg.indexOf(' ')).toLowerCase());
+    // Extract the professor name from the message
+    var profName = (arg.substr(0,arg.indexOf(' ')).toLowerCase());
+
+    // This error will occur both if they didn't add a review or if they only inputed !ratep
+    if (profName.trim() == "") {
+        message.channel.send(`**Error:** You must include a professor's name and a review.\nPlease use the format \`!ratep professor_name Type your review here\``)
+        return
+    }
 
     fs.readFile('./logs/professors/professors.txt', function (err, data) 
     {
         if (err) throw err;
-        if (data.includes(profname))
-        {
-            var review = arg.substr(arg.indexOf(' ')+1);
-
-            var file = ('./logs/professors/' + profname.toLowerCase() + '.txt').toString().split("\n");
-            message.channel.send(`Submitting review for mod review!  Thanks for taking the time to submit a review!`);
-            approveReview(message, review, client, file, profname);
-        }
-        else 
-        {
-            message.channel.send("Sorry, that professor does not exist!");
-        }
-    });
+         // Parse data along new line into a list of strings
+         var professors = data.toString().split("\n");
+         // Determine how similar user input is to an existing professor
+         searchSimilarity(
+             professors,
+             profName,
+             // If exact match - proceed with approval
+             onExact = (professor) => {
+                var review = arg.substr(arg.indexOf(' ')+1);
+                var file = ('./logs/professors/' + professor + '.txt').toString().split("\n");
+                message.channel.send(`Submitting review for mod review!  Thanks for taking the time to submit a review!`)
+                approveReview(message, review, client, file, professor); 
+             },
+             // Else, if similar, inform the user of correct spelling but do not proceed with approval
+             onSimilar = (userInput, professor) => message.channel.send(`Sorry, **${userInput}** does not exist in our system! Did you mean **${professor}**?`),
+             onNone = (userInput) => message.channel.send(`Sorry, no professor with a name of or similar to **${userInput}** exists in our system!`)
+        )
+    })
 }
 
 //Code for approving a new professor review
@@ -194,38 +207,28 @@ async function viewRatings(message)
     if((message.channel.id === `${proftalkchannel}`) || (message.channel.id === `${botcommands}`)|| (message.channel.id === `${modbotcommands}`) || (`${devstate}` == 'true'))
     {
         var viewprofName = message.content.slice(12).trim().toString();
-        if (viewprofName.localeCompare("")==0)
+        if (viewprofName.localeCompare("") == 0)
         {
-            message.channel.send("I don't know what Professor's ratings to give if you don't specify a Professor's name first, silly goose.");
+            message.channel.send(`**Error:** You must include a professor's name.\nPlease use the format \`!viewratings professor_name\``)
             return;
         }
+        
         fs.readFile('./logs/professors/professors.txt', function (err, data) 
         {
             if (err) throw err;
             // Parse data along new line into a list of strings
             var professors = data.toString().split("\n");
-
-            // Iterate through each professor, find which most similar to user input
-            var maxSimilarityProf = ""
-            var maxSimilarityValue = 0
-
-            professors.forEach(professor => {
-                var similarityVal = similarity(professor.toLowerCase().trim(), viewprofName.toLowerCase().trim())
-                if (similarityVal > maxSimilarityValue) {
-                    maxSimilarityValue = similarityVal
-                    maxSimilarityProf = professor.trim()
-                }
-            });
-
-            // If exactly similar upload file
-            if (maxSimilarityValue == 1) message.channel.send("Ratings for Professor " + viewprofName, { files: ['./logs/professors/' + viewprofName.toLowerCase() + '.txt'] });
-            // If similarish to a professor, let the user know correct spelling and upload file
-            else if (maxSimilarityValue > 0.35) {
-                message.channel.send(`Sorry, **${viewprofName.toLowerCase()}** does not exist in our system! Did you mean **${maxSimilarityProf}**?`)
-                message.channel.send("Ratings for Professor " + maxSimilarityProf, { files: ['./logs/professors/' + maxSimilarityProf.toLowerCase() + '.txt'] });
-            }
-            // Otherwise, if not similar to anything, let them know
-            else message.channel.send(`Sorry, no professor with a name of or similar to **${viewprofName}** exists in our system!`)
+            // Determine how similar user input is to an existing professor
+            searchSimilarity(
+                professors,
+                viewprofName,
+                onExact = (professor) => message.channel.send("Ratings for Professor " + professor, { files: ['./logs/professors/' + professor + '.txt'] }),
+                onSimilar = (userInput, professor) => {
+                    message.channel.send(`Sorry, **${userInput}** does not exist in our system! Did you mean **${professor}**?`)
+                    message.channel.send("Ratings for Professor " + professor, { files: ['./logs/professors/' + professor + '.txt'] });
+                },
+                onNone = (userInput) => message.channel.send(`Sorry, no professor with a name of or similar to **${userInput}** exists in our system!`)
+            )
         });
     }
     else
@@ -233,6 +236,26 @@ async function viewRatings(message)
         console.log(message.author.username+` tried using viewratings in `+message.channel.name);
         message.channel.send(`Command only allowed in prof-talk-and-suggestions and bot-commands`);
     }
+}
+
+// Function to search a list of professors for a user input with callbacks dependent on result
+function searchSimilarity(professors, userInput, onExact, onSimilar, onNone) {
+        // Iterate through each professor, find which most similar to user input
+        var maxSimilarityProf = ""
+        var maxSimilarityValue = 0
+        
+        professors.forEach(professor => {
+            var similarityVal = similarity(professor.toLowerCase().trim(), userInput.toLowerCase().trim())
+                if (similarityVal > maxSimilarityValue) {
+                    maxSimilarityValue = similarityVal
+                    maxSimilarityProf = professor.trim().toLowerCase()
+                }
+            }
+        );
+        // Callback dependent on how similar input was to a professor
+        if (maxSimilarityValue == 1) onExact(maxSimilarityProf)
+        else if (maxSimilarityValue > 0.35) onSimilar(userInput.trim().toLowerCase(), maxSimilarityProf)
+        else onNone(userInput.trim().toLowerCase())
 }
 
 // HELPER FUNCTIONS TO DETERMINE HOW SIMILAR A STRING IS TO ANOTHER STRING
