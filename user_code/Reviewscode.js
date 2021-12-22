@@ -238,24 +238,24 @@ async function viewRatings(message)
     }
 }
 
-// Function to search a list of professors for a user input with callbacks dependent on result
-function searchSimilarity(professors, userInput, onExact, onSimilar, onNone) {
-        // Iterate through each professor, find which most similar to user input
-        var maxSimilarityProf = ""
+// Function to search a list of strings(professors) for a string(user-input) with callbacks dependent on result
+function searchSimilarity(strings, target, onExact, onSimilar, onNone) {
+        // Iterate through each string(professor), find which most similar to user input
+        var maxSimilarityString = ""
         var maxSimilarityValue = 0
         
-        professors.forEach(professor => {
-            var similarityVal = similarity(professor.toLowerCase().trim(), userInput.toLowerCase().trim())
+        strings.forEach(string => {
+            var similarityVal = similarity(string.toLowerCase().trim(), target.toLowerCase().trim())
                 if (similarityVal > maxSimilarityValue) {
                     maxSimilarityValue = similarityVal
-                    maxSimilarityProf = professor.trim().toLowerCase()
+                    maxSimilarityString = string.trim().toLowerCase()
                 }
             }
         );
         // Callback dependent on how similar input was to a professor
-        if (maxSimilarityValue == 1) onExact(maxSimilarityProf)
-        else if (maxSimilarityValue > 0.35) onSimilar(userInput.trim().toLowerCase(), maxSimilarityProf)
-        else onNone(userInput.trim().toLowerCase())
+        if (maxSimilarityValue == 1) onExact(maxSimilarityString)
+        else if (maxSimilarityValue > 0.35) onSimilar(target.trim().toLowerCase(), maxSimilarityString)
+        else onNone(target.trim().toLowerCase())
 }
 
 // HELPER FUNCTIONS TO DETERMINE HOW SIMILAR A STRING IS TO ANOTHER STRING
