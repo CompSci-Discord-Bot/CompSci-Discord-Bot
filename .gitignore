@@ -22,3 +22,4 @@ user_code/Brendan/chatlog.js
 user_code/Brendan/mentionalerts.js
 user_code/Brendan/presenceAlerts.js
 user_code/Brendan/voiceUpdates.js
+*.txt
