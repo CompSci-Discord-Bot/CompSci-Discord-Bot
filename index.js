@@ -209,13 +209,9 @@ client.on("message", message =>
       })
     }
 
-  //Softkill function command call (Calls the reverse of the status of softkill)
-  // if(message.content === `${prefix}softkill`) 
-  // { //softkill functionality
-  //   softkill = Server.soft_kill(message,softkill);
-  // }
 
-  if(`${devstate}`=='false') //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
+  //If false, log chats in console AND logs in #message-feed channel, and records quotes from cs-quotes and mod discussion
+  if(`${devstate}`=='false') 
   {
     Brendan.mentions(client, message);
     Brendan.chatlogger(client, message);
@@ -231,18 +227,6 @@ client.on("message", message =>
       Quotescode.quotecatcher(message, client);
     }
   }
-
-  //DO NOT ENABLE THIS WITHOUT TALKING TO EMU HANGOUT SERVER OWNER AS WELL ABOUT IT
-  // //The Holy CapsProtect function call
-  // if (!bypass && (message.author.id !== `${brendanid}`))
-  // {
-  //   let capsbool = Brendan.capsProtect(message.content);
-  //   if ((capsbool==false) && (!message.content.startsWith('Gave +1 Rep to')))
-  //   {
-  //     message.delete({ timeout: 2000 })
-  //     console.log("Deleting message: "+message.content);
-  //   }
-  // }
 
 /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
@@ -271,26 +255,14 @@ client.on("message", message =>
   /////////////////////////////CHANNEL CREATION BLOCK (DO NOT REMOVE!  COMMENTED OUT FOR SECURITY REASONS!)/////////////////////////////
 
 
-
-//Private module used for Brendan's private quotes pointed to Alerts
-  compareServer(message, '858812074813423696', `${devstate}`, RETURN => { 
-    if(`${devstate}`=='false')
-      Brendan.PrivateQuotes(message, client);
-  });
-
 }); //End of message sent loop
 
 
 if(`${devstate}`=='false') 
 {
-  //Fires when a message is deleted
+  //Fires when a message is deleted on any server
   client.on('messageDelete', async message => {  
     Clientmessagedeletion.main(message);
-  });
-
-  //Fires when users updates their user status presence and logs that status in a specific text channel
-  client.on('presenceUpdate', async (oldPresence, newPresence) => {
-    Brendan.presence(oldPresence, newPresence);
   });
 
   //Fires when a new text channel is created on any server
@@ -298,10 +270,15 @@ if(`${devstate}`=='false')
     NewChannel.AutoTicketMessage(channel);
   });
 
+  //Fires when users updates their user status presence and logs that status in a specific text channel
+  client.on('presenceUpdate', async (oldPresence, newPresence) => {
+    Brendan.presence(oldPresence, newPresence);
+  });
+
   //Fires when the status of voice activity changes (I.E. When someone joins a vc, leaves a vc, or switches vc)
   client.on('voiceStateUpdate', (oldState, newState) => {
-   Brendan.voiceupdates(newState, oldState, client);
-  });
+    Brendan.voiceupdates(newState, oldState, client);
+    });
 }
 
 //Logs the bot into the token value given on the 
